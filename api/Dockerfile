@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Chạy server
-CMD ["node", "server.js"]
+CMD ["node", "index.js"]
