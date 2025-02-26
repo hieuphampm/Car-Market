@@ -13,6 +13,10 @@ const query = `
   type Query {
     _empty: String
   }
+
+  type Mutation {
+    _emptyAction: String
+  }
 `;
 const typeDefs = [query, hello, salute, categories];
 const resolvers = _.merge(helloResolvers, saluteResolvers, categoriesResolvers);
