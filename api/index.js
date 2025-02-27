@@ -5,21 +5,24 @@ import { useGraphQLMiddleware } from "@envelop/graphql-middleware";
 import { permissions } from "./permissions.js";
 import { db } from "./config.js";
 
-const mockData = {
-  categories: [
-    { id: 1, name: "Asus" },
-    { id: 2, name: "Dell" },
-    { id: 3, name: "HP" },
-    { id: 4, name: "MSI" },
-  ],
-};
+import {initDatabase} from "./data/init.js"
+await initDatabase();
 
-const mockDb = {
-  categories: {
-    getAll: () => mockData.categories,
-    findById: (id) => mockData.categories.find((item) => item.id == id),
-  },
-};
+// const mockData = {
+//   categories: [
+//     { id: 1, name: "Asus" },
+//     { id: 2, name: "Dell" },
+//     { id: 3, name: "HP" },
+//     { id: 4, name: "MSI" },
+//   ],
+// };
+
+// const mockDb = {
+//   categories: {
+//     getAll: () => mockData.categories,
+//     findById: (id) => mockData.categories.find((item) => item.id == id),
+//   },
+// };
 
 const yoga = createYoga({
   schema,
