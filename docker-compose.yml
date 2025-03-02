@@ -3,9 +3,29 @@ services:
   backend:
     build: ./api
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
       - NODE_ENV=production
+      # - DATABASE_URL=mongodb://mongo:27017/shop 
+      - DATABASE_URL=mongodb://root:1234@mongo:27017/shop?authSource=admin
     volumes:
-      - ./backend:/app
+      - ./api:/app
+    depends_on:
+      - mongo 
     restart: always
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_container
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+    command: "mongod --bind_ip_all"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
