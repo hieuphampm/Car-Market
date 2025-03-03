@@ -18,8 +18,9 @@ export const AircraftSchema = new Schema(
     capacity: Int,
     weight: Int,
     image: String,
+    description: String
   },
-  {
-    collection: "aircrafts",
-  }
+  { timestamps: true }
 );
+
+export const Aircraft = mongoose.model("Aircraft", AircraftSchema);
