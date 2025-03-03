@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,8 @@
 		1CC097A42D7546CE00AA3E29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC097792D7546CD00AA3E29 /* ContentView.swift */; };
 		1CC097A52D7546CE00AA3E29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1CC0977A2D7546CE00AA3E29 /* Assets.xcassets */; };
 		1CC097A62D7546CE00AA3E29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1CC0977A2D7546CE00AA3E29 /* Assets.xcassets */; };
+		1CC097C22D754CC000AA3E29 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC097C12D754CC000AA3E29 /* HomeView.swift */; };
+		1CC097C32D754CC000AA3E29 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CC097C12D754CC000AA3E29 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,7 @@
 		1CC0979A2D7546CE00AA3E29 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CC0979E2D7546CE00AA3E29 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
 		1CC097A02D7546CE00AA3E29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1CC097C12D754CC000AA3E29 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,8 +101,11 @@
 		1CC097772D7546CD00AA3E29 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				1CC097BC2D754C1F00AA3E29 /* Network */,
+				1CC097BB2D754C1000AA3E29 /* Models */,
+				1CC097BA2D754C0000AA3E29 /* Components */,
+				1CC097B92D754BF200AA3E29 /* Views */,
 				1CC097782D7546CD00AA3E29 /* IOSApp.swift */,
-				1CC097792D7546CD00AA3E29 /* ContentView.swift */,
 				1CC0977A2D7546CE00AA3E29 /* Assets.xcassets */,
 			);
 			path = Shared;
@@ -149,6 +155,36 @@
 				1CC097A02D7546CE00AA3E29 /* Info.plist */,
 			);
 			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
+		1CC097B92D754BF200AA3E29 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1CC097792D7546CD00AA3E29 /* ContentView.swift */,
+				1CC097C12D754CC000AA3E29 /* HomeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1CC097BA2D754C0000AA3E29 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		1CC097BB2D754C1000AA3E29 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1CC097BC2D754C1F00AA3E29 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,7 +286,7 @@
 				};
 			};
 			buildConfigurationList = 1CC097762D7546CD00AA3E29 /* Build configuration list for PBXProject "IOS" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -308,6 +344,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CC097C22D754CC000AA3E29 /* HomeView.swift in Sources */,
 				1CC097A32D7546CE00AA3E29 /* ContentView.swift in Sources */,
 				1CC097A12D7546CE00AA3E29 /* IOSApp.swift in Sources */,
 			);
@@ -317,6 +354,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CC097C32D754CC000AA3E29 /* HomeView.swift in Sources */,
 				1CC097A42D7546CE00AA3E29 /* ContentView.swift in Sources */,
 				1CC097A22D7546CE00AA3E29 /* IOSApp.swift in Sources */,
 			);
