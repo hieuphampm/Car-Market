@@ -1,109 +1,42 @@
-.App {
-  font-family: Arial, sans-serif;
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
   text-align: center;
 }
 
-nav {
-  background-color: #1e3a8a;
-  color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-nav a {
-  color: white;
-  margin: 0 1rem;
-  text-decoration: none;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-footer {
-  background-color: #374151;
-  color: white;
-  padding: 1rem;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-div {
-  padding: 2rem;
+.card {
+  padding: 2em;
 }
 
-.home-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  background: url('/aircraft-bg.jpg') no-repeat center center/cover;
-}
-
-.home-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 600px;
-}
-
-.home-title {
-  font-size: 3rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.home-subtitle {
-  margin-top: 1rem;
-  font-size: 1.25rem;
-}
-
-.home-description {
-  margin-top: 0.5rem;
-  font-size: 1rem;
-}
-
-.home-buttons {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.home-button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  border-radius: 8px;
-  transition: 0.3s;
-}
-
-.home-button-primary {
-  background: #FFD700;
-  color: black;
-}
-
-.home-button-primary:hover {
-  background: #FFC107;
-}
-
-.home-button-secondary {
-  border: 2px solid white;
-  color: white;
-}
-
-.home-button-secondary:hover {
-  background: white;
-  color: #1E3A8A;
-}
-
-.home-footer {
-  position: absolute;
-  bottom: 1rem;
-  font-size: 0.875rem;
-  color: #D1D5DB;
+.read-the-docs {
+  color: #888;
 }
