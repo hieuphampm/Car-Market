@@ -29,3 +29,81 @@ footer {
 div {
   padding: 2rem;
 }
+
+.home-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background: url('/aircraft-bg.jpg') no-repeat center center/cover;
+}
+
+.home-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 600px;
+}
+
+.home-title {
+  font-size: 3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-subtitle {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+}
+
+.home-description {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+.home-buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.home-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.home-button-primary {
+  background: #FFD700;
+  color: black;
+}
+
+.home-button-primary:hover {
+  background: #FFC107;
+}
+
+.home-button-secondary {
+  border: 2px solid white;
+  color: white;
+}
+
+.home-button-secondary:hover {
+  background: white;
+  color: #1E3A8A;
+}
+
+.home-footer {
+  position: absolute;
+  bottom: 1rem;
+  font-size: 0.875rem;
+  color: #D1D5DB;
+}
