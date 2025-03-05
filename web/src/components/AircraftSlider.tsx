@@ -1,60 +1,111 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-export const AircraftSlider = () => {
+const AircraftSlider = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const aircrafts = [
     {
       id: 1,
-      name: "Airbus A350",
+      name: "Praetor 600",
+      price: "$20,500,000",
+      status: "Used",
       image:
-        "https://firebasestorage.googleapis.com/v0/b/computer-shop-management-a2cdd.appspot.com/o/aircarft%2Fairbus-a350%2Fa350.jpg?alt=media&token=6744c6ac-1f08-4161-bc21-a1b04f6255dd",
-      price: "$300.5M",
+        "https://firebasestorage.googleapis.com/v0/b/computer-shop-management-a2cdd.appspot.com/o/aircarft%2FPraetor%20600%2FPraetor%20600.jpg?alt=media&token=fe580cdb-83e1-4398-b7b8-420e1b83621e",
+      category: "Private Jet",
     },
     {
       id: 2,
       name: "Boeing 787 Dreamliner",
+      price: "$248,300,000",
+      status: "New",
       image:
         "https://firebasestorage.googleapis.com/v0/b/computer-shop-management-a2cdd.appspot.com/o/aircarft%2Fboeing%2FBoeing%20787.jpg?alt=media&token=1d30e258-b32a-41f9-8f94-2b12129600f7",
-      price: "$248.3M",
+      category: "Commercial Aircraft",
     },
     {
       id: 3,
-      name: "Cessna 510",
+      name: "Cessna 510 Citation Mustang",
+      price: "$2,325,000",
+      status: "Used",
       image:
         "https://firebasestorage.googleapis.com/v0/b/computer-shop-management-a2cdd.appspot.com/o/aircarft%2FCessna%20510%2FCessna%20510.jpg?alt=media&token=091a78c7-478b-4cd9-a15a-e3270885e644",
-      price: "$23.5M",
+      category: "Private Jet",
+    },
+    {
+      id: 4,
+      name: "ATR 72 Cargo",
+      price: "$23,500,000",
+      status: "Used",
+      image:
+        "https://firebasestorage.googleapis.com/v0/b/computer-shop-management-a2cdd.appspot.com/o/aircarft%2Fatr-72%2Fatr72.jpg?alt=media&token=6ea2e00a-59ed-4469-a5b6-c02b2ac61bbc",
+      category: "Cargo Jet",
     },
   ];
+  const visibleAircrafts = aircrafts.slice(currentSlide, currentSlide + 3);
+  const nextSlide = () => {
+    if (currentSlide < aircrafts.length - 3) {
+      setCurrentSlide(currentSlide + 1);
+    } else {
+      setCurrentSlide(0);
+    }
+  };
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+    } else {
+      setCurrentSlide(aircrafts.length - 3);
+    }
+  };
   return (
-    <section className="py-16 bg-[#F9F9F9]">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-[#1A3D7A] mb-8">
-          Latest Aircraft
-        </h2>
-        <div className="relative">
-          <div className="flex space-x-6 overflow-x-auto pb-4">
-            {aircrafts.map((aircraft) => (
-              <div
-                key={aircraft.id}
-                className="min-w-[300px] bg-white rounded-lg shadow-lg"
-              >
+    <div className="relative">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {visibleAircrafts.map((aircraft) => (
+          <Link
+            key={aircraft.id}
+            to={`/aircraft/${aircraft.id}`}
+            className="group"
+          >
+            <div className="bg-white rounded-lg overflow-hidden shadow-lg transition-transform transform group-hover:-translate-y-2 duration-300">
+              <div className="relative h-48 overflow-hidden">
                 <img
                   src={aircraft.image}
                   alt={aircraft.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold text-[#1A3D7A]">
-                    {aircraft.name}
-                  </h3>
-                  <p className="text-[#F5C518] font-bold mt-2">
-                    {aircraft.price}
-                  </p>
+                <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                  {aircraft.status}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="p-6">
+                <div className="text-sm text-gray-500 mb-2">
+                  {aircraft.category}
+                </div>
+                <h3 className="text-xl font-bold mb-2">{aircraft.name}</h3>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-600 font-bold">
+                    {aircraft.price}
+                  </span>
+                  <span className="text-sm text-gray-500">View Details</span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
-    </section>
+      {/* Navigation Arrows */}
+      <button
+        onClick={prevSlide}
+        className="absolute -left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+      >
+        <ChevronLeft size={24} />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+      >
+        <ChevronRight size={24} />
+      </button>
+    </div>
   );
 };
+export default AircraftSlider;
