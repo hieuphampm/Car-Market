@@ -13,6 +13,7 @@ export const typeDef = `
         capacity: Int!
         weight: Int!
         image: String!
+        description: String!
     } 
 
     input AircraftInput {
@@ -28,6 +29,7 @@ export const typeDef = `
         capacity: Int!
         weight: Int!
         image: String!
+        description: String!
     }
 
     extend type Query {

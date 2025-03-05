@@ -27,3 +27,26 @@ export const typeDef = `
         updatePayment(id: Int!, input: PaymentInput!): Payment
     }
 `;
+
+export const resolvers = {
+    Query: {
+        payments: async () => {
+            return await Payment.findAll();
+        },
+        payment: async (parent, args) => {
+            return await Payment.findByPk(args.id);
+        }
+    },
+    Mutation: {
+        deletePayment: async (parent, args) => {
+            return await Payment.destroy({ where: { id: args.id } });
+        },
+        createPayment: async (parent, args) => {
+            return await Payment.create(args.input);
+        },
+        updatePayment: async (parent, args) => {
+            await Payment.update(args.input, { where: { id: args.id } });
+            return await Payment.findByPk(args.id);
+        }
+    }
+};

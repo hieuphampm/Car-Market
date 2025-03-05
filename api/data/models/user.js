@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 let Schema = mongoose.Schema;
 let String = Schema.Types.String;
 
-export const CategorySchema = new Schema(
+export const UserSchema = new Schema(
   {
-    name: String,
+    username: String,
   },
   {
-    collection: "categories",
+    collection: "users",
   }
 );
