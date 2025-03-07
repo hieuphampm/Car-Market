@@ -32,14 +32,13 @@ const generateCrudFunctions = (data) => ({
 });
 
 const db = {
-  categories: generateCrudFunctions(mockData.categories),
-  aircrafts: generateCrudFunctions(mockData.aircrafts),
-  customers: generateCrudFunctions(mockData.customers),
-  deliveries: generateCrudFunctions(mockData.deliveries),
-  orders: generateCrudFunctions(mockData.orders),
-  payments: generateCrudFunctions(mockData.payments),
-  reviews: generateCrudFunctions(mockData.reviews),
-  warranties: generateCrudFunctions(mockData.warranties),
+  cars: generateCrudFunctions(mockData.car),
+  favorites: generateCrudFunctions(mockData.favorite),
+  orders: generateCrudFunctions(mockData.order),
+  reviews: generateCrudFunctions(mockData.review),
+  warranties: generateCrudFunctions(mockData.warranty),
+  payments: generateCrudFunctions(mockData.payment),
+  users: generateCrudFunctions(mockData.user),
 };
 
 export { db };

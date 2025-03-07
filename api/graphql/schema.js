@@ -2,13 +2,13 @@ import { createSchema } from "graphql-yoga";
 import _ from "lodash";
 
 // Import typeDefs and resolvers
-import { typeDef as aircrafts, resolvers as aircraftsResolvers } from "./aircrafts.js";
-import { typeDef as customers, resolvers as customersResolvers } from "./customers.js";
-import { typeDef as delivery, resolvers as deliveryResolvers } from "./deliveries.js";
-import { typeDef as orders, resolvers as ordersResolvers } from "./orders.js";
-import { typeDef as payments, resolvers as paymentsResolvers } from "./payments.js";
-import { typeDef as reviews, resolvers as reviewsResolvers } from "./reviews.js";
-import { typeDef as warranties, resolvers as warrantiesResolvers } from "./warranties.js";
+import { typeDef as car, resolvers as carResolvers } from "./car.js";
+import { typeDef as review, resolvers as reviewResolvers } from "./review.js";
+import { typeDef as favorite, resolvers as favoriteResolvers } from "./favorite.js";
+import { typeDef as order, resolvers as orderResolvers } from "./order.js";
+import { typeDef as warranty, resolvers as warrantyResolvers } from "./warranty.js";
+import { typeDef as payment, resolvers as paymentResolvers } from "./payment.js";
+
 import {typeDef as login, resolvers as loginResolvers} from "./authentication.js";
 
 // Define the base query and mutation
@@ -31,15 +31,14 @@ const saluteResolver = {
 };
 
 // Merge typeDefs and resolvers
-const typeDefs = [query, , aircrafts, reviews, customers, delivery, orders, payments, warranties, login];
+const typeDefs = [query, car, review, favorite, order, warranty, payment, login];
 const resolvers = _.merge(
-  aircraftsResolvers,
-  reviewsResolvers,
-  customersResolvers,
-  deliveryResolvers,
-  ordersResolvers,
-  paymentsResolvers,
-  warrantiesResolvers,
+  carResolvers,
+  reviewResolvers,
+  favoriteResolvers,
+  orderResolvers,
+  warrantyResolvers,
+  paymentResolvers,
   saluteResolver,
   loginResolvers
 );

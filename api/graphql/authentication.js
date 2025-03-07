@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const typeDef = `
@@ -24,16 +24,16 @@ export const typeDef = `
 
 export const resolvers = {
   Mutation: {
-    login: async (parent, args, context, info) => {
-      var { username, password } = args.input;
-      if (username.length == 0 || password == 0) {
+    login: async (_, { input }, { db }) => {
+      const { username, password } = input;
+      if (!username || !password) {
         return {
           success: false,
           message: "Username or password cannot be empty",
         };
       }
 
-      var user = await context.db.users.findOne(username);
+      const user = await db.collection("users").findOne({ username });
 
       if (!user) {
         return {
@@ -42,31 +42,29 @@ export const resolvers = {
         };
       }
 
-      var isOkay = await bcrypt.compare(password, user.password);
-      if (isOkay) {
-        var token = jwt.sign(
-          {
-            username: user.username,
-            role: user.role,
-          },
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "24h",
-          }
-        );
-
+      const isOkay = await bcrypt.compare(password, user.password);
+      if (!isOkay) {
         return {
-          success: true,
-          message: "Login successfully",
-          data: {
-            jwt: token,
-          },
+          success: false,
+          message: "Invalid username or password",
         };
       }
 
+      const token = jwt.sign(
+        {
+          username: user.username,
+          role: user.role || "user",
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
       return {
-        success: false,
-        message: "Invalid username or password",
+        success: true,
+        message: "Login successfully",
+        data: {
+          jwt: token,
+        },
       };
     },
   },

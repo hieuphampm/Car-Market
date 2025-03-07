@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
 let Schema = mongoose.Schema;
-let String = Schema.Types.String;
-let Int = Schema.Types.Number;
-let Float = Schema.Types.Number;
+let ObjectId = Schema.Types.ObjectId;
+let DateType = Schema.Types.Date;
+let NumberType = Schema.Types.Number;
+let StringType = Schema.Types.String;
 
 export const PaymentSchema = new Schema(
   {
-    order_id: Int,
-    amount: Float,
-    payment_date: String,
-    payment_method: String,
-    payment_status: String,
+    orderId: { type: ObjectId, required: true, ref: "orders" },
+    amount: { type: NumberType, required: true },
+    paymentMethod: { type: StringType, required: true },
+    paymentDate: { type: DateType, default: Date.now },
+    status: { type: StringType, required: true },
   },
   {
     collection: "payments",
