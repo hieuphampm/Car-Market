@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { User } from "../data/models/user.js"; 
 
 export const typeDef = `
     type LoginResult {
@@ -24,7 +25,7 @@ export const typeDef = `
 
 export const resolvers = {
   Mutation: {
-    login: async (_, { input }, { db }) => {
+    login: async (_, { input }) => {
       const { username, password } = input;
       if (!username || !password) {
         return {
@@ -33,7 +34,8 @@ export const resolvers = {
         };
       }
 
-      const user = await db.collection("users").findOne({ username });
+      // Tìm người dùng trong database bằng Mongoose
+      const user = await User.findOne({ username });
 
       if (!user) {
         return {
@@ -42,16 +44,23 @@ export const resolvers = {
         };
       }
 
-      const isOkay = await bcrypt.compare(password, user.password);
-      if (!isOkay) {
+      // Kiểm tra mật khẩu
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
         return {
           success: false,
           message: "Invalid username or password",
         };
       }
 
+      if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined in environment variables");
+      }
+
+      // Tạo token JWT
       const token = jwt.sign(
         {
+          id: user._id,
           username: user.username,
           role: user.role || "user",
         },
@@ -61,7 +70,7 @@ export const resolvers = {
 
       return {
         success: true,
-        message: "Login successfully",
+        message: "Login successful",
         data: {
           jwt: token,
         },

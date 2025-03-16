@@ -1,4 +1,4 @@
-import { Car, Favorite, Order, Review, Warranty, Payment, User } from "./models/index.js";
+import { Cars, Favorites, Orders, Reviews, Warranties, Payments, User } from "./models/index.js";
 
 const generateMongoRepo = (Model) => ({
   getAll: async () => {
@@ -20,12 +20,12 @@ const generateMongoRepo = (Model) => ({
 });
 
 const db = {
-  car: generateMongoRepo(Car),
-  favorite: generateMongoRepo(Favorite),
-  order: generateMongoRepo(Order),
-  payment: generateMongoRepo(Payment),
-  review: generateMongoRepo(Review),
-  warranty: generateMongoRepo(Warranty),
+  cars: generateMongoRepo(Cars),
+  favorite: generateMongoRepo(Favorites),
+  order: generateMongoRepo(Orders),
+  payment: generateMongoRepo(Payments),
+  review: generateMongoRepo(Reviews),
+  warranty: generateMongoRepo(Warranties),
   users: {
     findOne: async (username) => {
       return await User.findOne({ username }).lean();

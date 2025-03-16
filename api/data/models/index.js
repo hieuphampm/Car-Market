@@ -1,18 +1,16 @@
 import mongoose from "mongoose";
+import { User } from "./user.js";
+import { CarSchema } from "./cars.js";
+import { FavoriteSchema } from "./favorites.js";
+import { OrderSchema } from "./orders.js";
+import { ReviewSchema } from "./reviews.js";
+import { WarrantySchema } from "./warranties.js";
+import { PaymentSchema } from "./payments.js";
 
-import { CarSchema } from "./car.js";
-import { FavoriteSchema } from "./favorite.js";
-import { OrderSchema } from "./order.js";
-import { ReviewSchema } from "./review.js";
-import { WarrantySchema } from "./warranty.js";
-import { PaymentSchema } from "./payment.js";
-import { UserSchema } from "./user.js";
-
-
-export const User = mongoose.model("user", UserSchema);
-export const Car = mongoose.model("car", CarSchema);
-export const Favorite = mongoose.model("favorite", FavoriteSchema);
-export const Order = mongoose.model("order", OrderSchema);
-export const Review = mongoose.model("review", ReviewSchema);
-export const Warranty = mongoose.model("warranty", WarrantySchema);
-export const Payment = mongoose.model("payment", PaymentSchema);
+export { User };
+export const Cars = mongoose.model("cars", CarSchema);
+export const Favorites = mongoose.model("favorites", FavoriteSchema);
+export const Orders = mongoose.model("orders", OrderSchema);
+export const Reviews = mongoose.model("reviews", ReviewSchema);
+export const Warranties = mongoose.model("warranties", WarrantySchema);
+export const Payments = mongoose.model("payments", PaymentSchema);

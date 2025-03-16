@@ -29,13 +29,13 @@ export const typeDef = `
 
 export const resolvers = {
     Query: {
-        payments: (parent, args, context) => context.db.payments.getAll(),
-        payment: (parent, args, context) => context.db.payments.findById(args.id),
+        payments: (parent, args, context) => context.db.payment.getAll(),
+        payment: (parent, args, context) => context.db.payment.findById(args.id),
     },
 
     Mutation: {
-        createPayment: (parent, args, context) => context.db.payments.create(args.input),
-        updatePayment: (parent, args, context) => context.db.payments.updateById(args.id, args.input),
-        deletePayment: (parent, args, context) => context.db.payments.deleteById(args.id),
+        createPayment: (parent, args, context) => context.db.payment.create(args.input),
+        updatePayment: (parent, args, context) => context.db.payment.updateById(args.id, args.input),
+        deletePayment: (parent, args, context) => context.db.payment.deleteById(args.id),
     },
 };

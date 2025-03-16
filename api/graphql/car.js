@@ -9,8 +9,10 @@ export const typeDef = `
         price: Float!
         transmission: String!
         fuelType: String!
+        engine: String!
         condition: String!
         description: String
+        mainImage: String 
         status: String!
         createdAt: String!
     }
@@ -24,8 +26,10 @@ export const typeDef = `
         price: Float!
         transmission: String!
         fuelType: String!
+        engine: String!
         condition: String!
         description: String
+        mainImage: String  # Thêm mainImage vào input CarInput
         status: String!
     }
 

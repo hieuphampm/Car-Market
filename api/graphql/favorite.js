@@ -24,12 +24,27 @@ export const typeDef = `
 
 export const resolvers = {
     Query: {
-        favorites: (parent, args, context) => context.db.favorites.getAll(),
-        favorite: (parent, args, context) => context.db.favorites.findById(args.id),
+        favorites: async (parent, args, { db }) => {
+            return await db.favorite.getAll();
+        },
+        
+        favorite: async (parent, { id }, { db }) => {
+            return await db.favorite.findById(id);
+        }        
     },
 
     Mutation: {
-        createFavorite: (parent, args, context) => context.db.favorites.create(args.input),
-        deleteFavorite: (parent, args, context) => context.db.favorites.deleteById(args.id),
-    },
+        createFavorite: async (parent, { input }, { db }) => {
+            return await db.favorite.create({
+                userId: input.userId,
+                carId: input.carId,
+                createdAt: new Date(),
+            });
+        },
+        
+        deleteFavorite: async (parent, { id }, { db }) => {
+            return await db.favorite.deleteById(id);
+        }
+        
+    }
 };
