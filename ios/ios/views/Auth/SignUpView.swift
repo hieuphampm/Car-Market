@@ -1,66 +1,66 @@
 //
-//  LoginView.swift
+//  SignUpView.swift
 //  ios
 //
-//  Created by umtlab03im13 on 13/3/25.
+//  Created by umtlab03im13 on 18/3/25.
 //
 
 import SwiftUI
 
-struct LoginView: View {
+struct SignUpView: View {
+    var navigateToLogin: () -> Void
+    
+    @State private var fullName = ""
     @State private var email = ""
     @State private var password = ""
-    @State private var rememberMe = false
+    @State private var confirmPassword = ""
+    @State private var acceptTerms = false
     @State private var isLoading = false
     @State private var showPassword = false
+    @State private var showConfirmPassword = false
     @State private var showAlert = false
     @State private var alertMessage = ""
     
     // For animation
-    @State private var logoOffset: CGFloat = -100
     @State private var formOpacity: Double = 0
     
     var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(gradient: Gradient(colors: [Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)), Color(#colorLiteral(red: 0.1019607857, green: 0.2784313858, blue: 0.400000006, alpha: 1))]),
-                           startPoint: .topLeading,
-                           endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-            
+        ScrollView {
             VStack(spacing: 20) {
-                // Logo
-                Spacer()
-                    .frame(height: 30)
-                Image(systemName: "car.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.2))
-                            .frame(width: 150, height: 150)
-                    )
-                    .offset(y: logoOffset)
-                    .onAppear {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
-                            logoOffset = 0
-                        }
-                        
-                        withAnimation(.easeInOut(duration: 0.7).delay(0.3)) {
-                            formOpacity = 1
-                        }
-                    }
-                
-                Text("Car Market")
+                // Header
+                Text("Create Account")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .padding(.bottom, 30)
-                    .offset(y: logoOffset)
+                    .padding(.bottom, 20)
+                    .padding(.top, 50)
                 
-                // Login form
+                // Signup form
                 VStack(spacing: 20) {
+                    // Full Name field
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Full Name")
+                            .foregroundColor(.white.opacity(0.8))
+                            .fontWeight(.medium)
+                        
+                        HStack {
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.white.opacity(0.5))
+                            
+                            TextField("", text: $fullName)
+                                .foregroundColor(.white)
+                                .autocapitalization(.words)
+                                .placeholder(when: fullName.isEmpty) {
+                                    Text("Enter your full name").foregroundColor(.white.opacity(0.5))
+                                }
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.1))
+                        )
+                    }
+                    
                     // Email field
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")
@@ -103,7 +103,7 @@ struct LoginView: View {
                                     .autocapitalization(.none)
                                     .disableAutocorrection(true)
                                     .placeholder(when: password.isEmpty) {
-                                        Text("Enter your password").foregroundColor(.white.opacity(0.5))
+                                        Text("Create a password").foregroundColor(.white.opacity(0.5))
                                     }
                             } else {
                                 SecureField("", text: $password)
@@ -111,7 +111,7 @@ struct LoginView: View {
                                     .autocapitalization(.none)
                                     .disableAutocorrection(true)
                                     .placeholder(when: password.isEmpty) {
-                                        Text("Enter your password").foregroundColor(.white.opacity(0.5))
+                                        Text("Create a password").foregroundColor(.white.opacity(0.5))
                                     }
                             }
                             
@@ -129,39 +129,87 @@ struct LoginView: View {
                         )
                     }
                     
-                    // Remember me & Forgot password
-                    HStack {
-                        Toggle(isOn: $rememberMe) {
-                            Text("Remember me")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .toggleStyle(CheckboxToggleStyle())
+                    // Confirm Password field
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Confirm Password")
+                            .foregroundColor(.white.opacity(0.8))
+                            .fontWeight(.medium)
                         
-                        Spacer()
-                        
-                        Button(action: {
-                            // Handle forgot password
-                        }) {
-                            Text("Forgot Password?")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
+                        HStack {
+                            Image(systemName: "lock.fill")
+                                .foregroundColor(.white.opacity(0.5))
+                            
+                            if showConfirmPassword {
+                                TextField("", text: $confirmPassword)
+                                    .foregroundColor(.white)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .placeholder(when: confirmPassword.isEmpty) {
+                                        Text("Confirm your password").foregroundColor(.white.opacity(0.5))
+                                    }
+                            } else {
+                                SecureField("", text: $confirmPassword)
+                                    .foregroundColor(.white)
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .placeholder(when: confirmPassword.isEmpty) {
+                                        Text("Confirm your password").foregroundColor(.white.opacity(0.5))
+                                    }
+                            }
+                            
+                            Button(action: {
+                                showConfirmPassword.toggle()
+                            }) {
+                                Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
+                                    .foregroundColor(.white.opacity(0.5))
+                            }
                         }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.1))
+                        )
                     }
                     
-                    // Login button
+                    // Terms and conditions
+                    HStack(alignment: .top) {
+                        Toggle(isOn: $acceptTerms) {
+                            Text("I agree to the ")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.8)) +
+                            Text("Terms of Service")
+                                .font(.subheadline)
+                                .foregroundColor(.white) +
+                            Text(" and ")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.8)) +
+                            Text("Privacy Policy")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
+                        .toggleStyle(CheckboxToggleStyle())
+                    }
+                    .padding(.top, 10)
+                    
+                    // Sign up button
                     Button(action: {
                         withAnimation {
                             isLoading = true
                         }
-                        // Simulate login process
+                        // Validate form
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             isLoading = false
-                            if email.isEmpty || password.isEmpty {
-                                alertMessage = "Please enter both email and password"
+                            if fullName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty {
+                                alertMessage = "Please fill in all fields"
+                                showAlert = true
+                            } else if password != confirmPassword {
+                                alertMessage = "Passwords do not match"
+                                showAlert = true
+                            } else if !acceptTerms {
+                                alertMessage = "Please accept the terms and conditions"
                                 showAlert = true
                             } else {
-                                // Handle successful login
+                                // Handle successful signup
                             }
                         }
                     }) {
@@ -174,7 +222,7 @@ struct LoginView: View {
                                     .progressViewStyle(CircularProgressViewStyle(tint: Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1))))
                                     .scaleEffect(1.5)
                             } else {
-                                Text("Log In")
+                                Text("Create Account")
                                     .font(.headline)
                                     .fontWeight(.bold)
                                     .foregroundColor(Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)))
@@ -185,9 +233,9 @@ struct LoginView: View {
                     }
                     .disabled(isLoading)
                     
-                    // Social login options
+                    // Social signup options
                     VStack(spacing: 15) {
-                        Text("Or continue with")
+                        Text("Or sign up with")
                             .foregroundColor(.white.opacity(0.7))
                         
                         HStack(spacing: 20) {
@@ -197,15 +245,15 @@ struct LoginView: View {
                         }
                     }
                     
-                    // Sign up button
+                    // Login link
                     HStack {
-                        Text("Don't have an account?")
+                        Text("Already have an account?")
                             .foregroundColor(.white.opacity(0.7))
                         
                         Button(action: {
-                            // Navigate to sign up
+                            navigateToLogin()
                         }) {
-                            Text("Sign Up")
+                            Text("Log In")
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                         }
@@ -220,6 +268,11 @@ struct LoginView: View {
                         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                 )
                 .opacity(formOpacity)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        formOpacity = 1
+                    }
+                }
             }
             .padding()
         }
@@ -227,75 +280,4 @@ struct LoginView: View {
             Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
-}
-
-// Helper components
-struct SocialLoginButton: View {
-    let image: String
-    let color: Color
-    
-    var body: some View {
-        Button(action: {
-            // Handle social login
-        }) {
-            Image(systemName: image)
-                .font(.system(size: 24))
-                .foregroundColor(color)
-                .frame(width: 60, height: 60)
-                .background(
-                    Circle()
-                        .fill(Color.white.opacity(0.1))
-                )
-        }
-    }
-}
-
-struct CheckboxToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(configuration.isOn ? Color(#colorLiteral(red: 0.9764705896, green: 0.8039215803, blue: 0.1843137443, alpha: 1)) : Color.white.opacity(0.2))
-                    .frame(width: 20, height: 20)
-                
-                if configuration.isOn {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)))
-                }
-            }
-            .onTapGesture {
-                withAnimation(.spring()) {
-                    configuration.isOn.toggle()
-                }
-            }
-            
-            configuration.label
-        }
-    }
-}
-
-// Extension for placeholder text
-extension View {
-    func placeholder<Content: View>(
-        when shouldShow: Bool,
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {
-        
-        ZStack(alignment: alignment) {
-            placeholder().opacity(shouldShow ? 1 : 0)
-            self
-        }
-    }
-}
-
-// Preview
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
-    }
-}
-
-#Preview {
-    LoginView()
 }
