@@ -30,6 +30,8 @@ struct LoginView: View {
             
             VStack(spacing: 20) {
                 // Logo
+                Spacer()
+                    .frame(height: 30)
                 Image(systemName: "car.fill")
                     .font(.system(size: 80))
                     .foregroundColor(.white)
@@ -58,7 +60,7 @@ struct LoginView: View {
                     .offset(y: logoOffset)
                 
                 // Login form
-                VStack(spacing: 25) {
+                VStack(spacing: 20) {
                     // Email field
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Email")

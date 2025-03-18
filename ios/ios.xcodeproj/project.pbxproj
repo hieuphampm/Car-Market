@@ -32,8 +32,8 @@
 		500767922D82AE5600ECAB2A = {
 			isa = PBXGroup;
 			children = (
-				5007679D2D82AE5600ECAB2A /* ios */,
 				5007679C2D82AE5600ECAB2A /* Products */,
+				5007679D2D82AE5600ECAB2A /* ios */,
 			);
 			sourceTree = "<group>";
 		};
