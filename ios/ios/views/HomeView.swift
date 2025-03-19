@@ -63,12 +63,20 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Navigation title area
+                // Navigation title area with Add button
                 HStack {
                     Text(tabTitle)
                         .font(.title2)
                         .fontWeight(.bold)
                     Spacer()
+                    
+                    if selectedTab == .home {
+                        NavigationLink(destination: AddCarView()) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.blue)
+                        }
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 16)
@@ -90,10 +98,12 @@ struct HomeView: View {
                                 .frame(height: 8)
                                 
                             ForEach(filteredCars) { car in
-                                CarCardView(car: car) {
-                                    // Toggle favorite
-                                    if let index = cars.firstIndex(where: { $0.id == car.id }) {
-                                        cars[index].isFavorite.toggle()
+                                NavigationLink(destination: CarDetailView(car: car)) {
+                                    CarCardView(car: car) {
+                                        // Toggle favorite
+                                        if let index = cars.firstIndex(where: { $0.id == car.id }) {
+                                            cars[index].isFavorite.toggle()
+                                        }
                                     }
                                 }
                             }
@@ -131,9 +141,11 @@ struct HomeView: View {
                                         .frame(height: 8)
                                         
                                     ForEach(filteredFavoriteCars) { car in
-                                        CarCardView(car: car) {
-                                            if let index = cars.firstIndex(where: { $0.id == car.id }) {
-                                                cars[index].isFavorite.toggle()
+                                        NavigationLink(destination: CarDetailView(car: car)) {
+                                            CarCardView(car: car) {
+                                                if let index = cars.firstIndex(where: { $0.id == car.id }) {
+                                                    cars[index].isFavorite.toggle()
+                                                }
                                             }
                                         }
                                     }
@@ -202,102 +214,6 @@ struct SearchBar: View {
     }
 }
 
-struct CarCardView: View {
-    let car: Car
-    let onFavoriteTapped: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Car Image
-            ZStack(alignment: .topTrailing) {
-                Image(car.imageURL)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 180)
-                    .clipped()
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                    )
-                
-                // Fallback for missing images in sample
-                Color.gray.opacity(0.1)
-                    .frame(height: 180)
-                    .cornerRadius(12)
-                
-                // Favorite button
-                Button(action: onFavoriteTapped) {
-                    Image(systemName: car.isFavorite ? "heart.fill" : "heart")
-                        .font(.system(size: 20))
-                        .padding(8)
-                        .foregroundColor(car.isFavorite ? .red : .white)
-                        .background(
-                            Circle()
-                                .fill(Color.white.opacity(0.8))
-                                .shadow(radius: 2)
-                        )
-                }
-                .padding(8)
-            }
-            
-            // Car Details
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(car.year) \(car.make) \(car.model)")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                
-                HStack {
-                    Text("$\(Int(car.price))")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.blue)
-                    
-                    Spacer()
-                    
-                    Text("\(car.mileage) mi")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                // Quick Info Pills
-                HStack(spacing: 8) {
-                    InfoPill(icon: "fuelpump.fill", text: "Gas")
-                    InfoPill(icon: "gear", text: "Auto")
-                    InfoPill(icon: "person.2.fill", text: "5 seats")
-                }
-                .padding(.top, 4)
-            }
-            .padding(.horizontal, 4)
-        }
-        .padding(.bottom, 8)
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: .gray.opacity(0.1), radius: 5, x: 0, y: 2)
-    }
-}
-
-struct InfoPill: View {
-    let icon: String
-    let text: String
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-            
-            Text(text)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(12)
-    }
-}
-
 struct CustomTabBar: View {
     @Binding var selectedTab: HomeView.Tab
     
@@ -341,85 +257,6 @@ struct TabBarButton: View {
             .foregroundColor(isSelected ? .blue : .gray)
             .frame(maxWidth: .infinity)
         }
-    }
-}
-
-struct ProfileView: View {
-    var body: some View {
-        VStack(spacing: 24) {
-            // Profile Header
-            VStack(spacing: 12) {
-                Image(systemName: "person.circle.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(.blue)
-                
-                Text("John Doe")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Premium Member")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            
-            // Profile Menu Items
-            VStack(spacing: 0) {
-                ProfileMenuItem(icon: "car.fill", title: "My Cars")
-                ProfileMenuItem(icon: "bell.fill", title: "Notifications")
-                ProfileMenuItem(icon: "creditcard.fill", title: "Payment Methods")
-                ProfileMenuItem(icon: "gear", title: "Settings")
-                ProfileMenuItem(icon: "questionmark.circle.fill", title: "Help & Support")
-            }
-            .background(Color.white)
-            .cornerRadius(12)
-            .shadow(color: .gray.opacity(0.1), radius: 5, x: 0, y: 2)
-            .padding(.horizontal)
-            
-            Spacer()
-            
-            // Sign Out Button
-            Button(action: {}) {
-                Text("Sign Out")
-                    .font(.headline)
-                    .foregroundColor(.red)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.red.opacity(0.1))
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal)
-            .padding(.bottom)
-        }
-        .padding(.top)
-    }
-}
-
-struct ProfileMenuItem: View {
-    let icon: String
-    let title: String
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(.blue)
-                .frame(width: 32, height: 32)
-            
-            Text(title)
-                .font(.body)
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(Color.white)
-        
-        Divider()
-            .padding(.leading, 60)
     }
 }
 
