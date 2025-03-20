@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct ForgotPasswordView: View {
     var navigateToLogin: () -> Void
@@ -16,9 +17,6 @@ struct ForgotPasswordView: View {
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     @State private var isSuccess = false
-    
-    // For animation
-    @State private var formOpacity: Double = 0
     
     var body: some View {
         VStack(spacing: 20) {
@@ -51,7 +49,6 @@ struct ForgotPasswordView: View {
                 )
                 .padding(.top, 20)
             
-            // Title and description
             Text("Forgot Password?")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -67,7 +64,6 @@ struct ForgotPasswordView: View {
             
             // Form
             VStack(spacing: 20) {
-                // Email field
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Email")
                         .foregroundColor(.white.opacity(0.8))
@@ -93,41 +89,21 @@ struct ForgotPasswordView: View {
                     )
                 }
                 
-                // Reset password button
-                Button(action: {
-                    withAnimation {
-                        isLoading = true
-                    }
-                    // Validate and send reset link
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        isLoading = false
-                        if email.isEmpty {
-                            alertTitle = "Error"
-                            alertMessage = "Please enter your email address"
-                            isSuccess = false
-                            showAlert = true
-                        } else {
-                            // Handle successful reset request
-                            alertTitle = "Success"
-                            alertMessage = "Password reset instructions have been sent to your email"
-                            isSuccess = true
-                            showAlert = true
-                        }
-                    }
-                }) {
+                // Firebase Reset Password Button
+                Button(action: resetPassword) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(#colorLiteral(red: 0.9764705896, green: 0.8039215803, blue: 0.1843137443, alpha: 1)))
+                            .fill(Color.yellow)
                         
                         if isLoading {
                             ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1))))
+                                .progressViewStyle(CircularProgressViewStyle(tint: Color.blue))
                                 .scaleEffect(1.5)
                         } else {
                             Text("Send Reset Link")
                                 .font(.headline)
                                 .fontWeight(.bold)
-                                .foregroundColor(Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)))
+                                .foregroundColor(.blue)
                                 .padding()
                         }
                     }
@@ -157,12 +133,6 @@ struct ForgotPasswordView: View {
                     .fill(Color.black.opacity(0.2))
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
             )
-            .opacity(formOpacity)
-            .onAppear {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    formOpacity = 1
-                }
-            }
             
             Spacer()
         }
@@ -177,6 +147,24 @@ struct ForgotPasswordView: View {
                     }
                 }
             )
+        }
+    }
+
+    // Firebase Reset Password Function
+    func resetPassword() {
+        isLoading = true
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
+            isLoading = false
+            if let error = error {
+                alertTitle = "Error"
+                alertMessage = error.localizedDescription
+                isSuccess = false
+            } else {
+                alertTitle = "Success"
+                alertMessage = "Password reset instructions have been sent to your email."
+                isSuccess = true
+            }
+            showAlert = true
         }
     }
 }
