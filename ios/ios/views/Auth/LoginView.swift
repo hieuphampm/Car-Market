@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseCore
+import GoogleSignIn
 
 struct LoginView: View {
     var navigateToSignUp: () -> Void
@@ -13,16 +16,10 @@ struct LoginView: View {
     
     @State private var email = ""
     @State private var password = ""
-    @State private var rememberMe = false
     @State private var isLoading = false
-    @State private var showPassword = false
     @State private var showAlert = false
     @State private var alertMessage = ""
-    
-    // For animation
-    @State private var logoOffset: CGFloat = -100
-    @State private var formOpacity: Double = 0
-    
+
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
@@ -38,24 +35,13 @@ struct LoginView: View {
                             .fill(Color.white.opacity(0.2))
                             .frame(width: 150, height: 150)
                     )
-                    .offset(y: logoOffset)
-                    .onAppear {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
-                            logoOffset = 0
-                        }
-                        
-                        withAnimation(.easeInOut(duration: 0.7).delay(0.3)) {
-                            formOpacity = 1
-                        }
-                    }
                 
                 Text("Car Market")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.bottom, 30)
-                    .offset(y: logoOffset)
-                
+
                 // Login form
                 VStack(spacing: 20) {
                     // Email field
@@ -94,30 +80,13 @@ struct LoginView: View {
                             Image(systemName: "lock.fill")
                                 .foregroundColor(.white.opacity(0.5))
                             
-                            if showPassword {
-                                TextField("", text: $password)
-                                    .foregroundColor(.white)
-                                    .autocapitalization(.none)
-                                    .disableAutocorrection(true)
-                                    .placeholder(when: password.isEmpty) {
-                                        Text("Enter your password").foregroundColor(.white.opacity(0.5))
-                                    }
-                            } else {
-                                SecureField("", text: $password)
-                                    .foregroundColor(.white)
-                                    .autocapitalization(.none)
-                                    .disableAutocorrection(true)
-                                    .placeholder(when: password.isEmpty) {
-                                        Text("Enter your password").foregroundColor(.white.opacity(0.5))
-                                    }
-                            }
-                            
-                            Button(action: {
-                                showPassword.toggle()
-                            }) {
-                                Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                                    .foregroundColor(.white.opacity(0.5))
-                            }
+                            SecureField("", text: $password)
+                                .foregroundColor(.white)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                                .placeholder(when: password.isEmpty) {
+                                    Text("Enter your password").foregroundColor(.white.opacity(0.5))
+                                }
                         }
                         .padding()
                         .background(
@@ -126,82 +95,52 @@ struct LoginView: View {
                         )
                     }
                     
-                    // Remember me & Forgot password
-                    HStack {
-                        Toggle(isOn: $rememberMe) {
-                            Text("Remember me")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                        .toggleStyle(CheckboxToggleStyle())
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            navigateToForgotPassword()
-                        }) {
-                            Text("Forgot Password?")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                    }
-                    
                     // Login button
-                    Button(action: {
-                        withAnimation {
-                            isLoading = true
-                        }
-                        // Simulate login process
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            isLoading = false
-                            if email.isEmpty || password.isEmpty {
-                                alertMessage = "Please enter both email and password"
-                                showAlert = true
-                            } else {
-                                // Handle successful login
-                            }
-                        }
-                    }) {
+                    Button(action: login) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(#colorLiteral(red: 0.9764705896, green: 0.8039215803, blue: 0.1843137443, alpha: 1)))
+                                .fill(Color.yellow)
                             
                             if isLoading {
                                 ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1))))
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color.blue))
                                     .scaleEffect(1.5)
                             } else {
                                 Text("Log In")
                                     .font(.headline)
                                     .fontWeight(.bold)
-                                    .foregroundColor(Color(#colorLiteral(red: 0.1411764771, green: 0.3960784376, blue: 0.5647059083, alpha: 1)))
+                                    .foregroundColor(.blue)
                                     .padding()
                             }
                         }
                         .frame(height: 55)
                     }
                     .disabled(isLoading)
-                    
-                    // Social login options
-                    VStack(spacing: 15) {
-                        Text("Or continue with")
-                            .foregroundColor(.white.opacity(0.7))
-                        
-                        HStack(spacing: 20) {
-                            SocialLoginButton(image: "apple.logo", color: .white)
-                            SocialLoginButton(image: "g.circle.fill", color: Color(#colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)))
-                            SocialLoginButton(image: "f.circle.fill", color: Color(#colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)))
+
+                    // Forgot password
+                    Button(action: navigateToForgotPassword) {
+                        Text("Forgot Password?")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+
+                    // Google Sign-In button
+                    Button(action: signInWithGoogle) {
+                        HStack {
+                            Image(systemName: "g.circle.fill")
+                                .foregroundColor(.red)
+                            Text("Continue with Google")
+                                .fontWeight(.bold)
                         }
                     }
-                    
+                    .padding()
+
                     // Sign up button
                     HStack {
                         Text("Don't have an account?")
                             .foregroundColor(.white.opacity(0.7))
                         
-                        Button(action: {
-                            navigateToSignUp()
-                        }) {
+                        Button(action: navigateToSignUp) {
                             Text("Sign Up")
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
@@ -216,12 +155,74 @@ struct LoginView: View {
                         .fill(Color.black.opacity(0.2))
                         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                 )
-                .opacity(formOpacity)
             }
             .padding()
         }
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Login"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
+    
+    // Firebase Email/Password Login
+    func login() {
+        isLoading = true
+        Auth.auth().signIn(withEmail: email, password: password) { result, error in
+            isLoading = false
+            if let error = error {
+                alertMessage = error.localizedDescription
+            } else {
+                alertMessage = "Login successful!"
+            }
+            showAlert = true
+        }
+    }
+
+    // Google Sign-In using Firebase
+    func signInWithGoogle() {
+        guard let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+              let plist = NSDictionary(contentsOfFile: path),
+              let clientID = plist["CLIENT_ID"] as? String else {
+            alertMessage = "Failed to retrieve GIDClientID from GoogleService-Info.plist"
+            showAlert = true
+            return
+        }
+
+        let config = GIDConfiguration(clientID: clientID)
+
+        guard let rootViewController = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?.windows
+            .first?.rootViewController else {
+            return
+        }
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { signInResult, error in
+            if let error = error {
+                alertMessage = "Google Sign-In Error: \(error.localizedDescription)"
+                showAlert = true
+                return
+            }
+
+            guard let result = signInResult,
+                  let idToken = result.user.idToken?.tokenString else {
+                alertMessage = "Failed to retrieve Google ID Token."
+                showAlert = true
+                return
+            }
+
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                           accessToken: result.user.accessToken.tokenString)
+
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    alertMessage = "Firebase Sign-In Error: \(error.localizedDescription)"
+                } else {
+                    alertMessage = "Google Sign-In Successful!"
+                }
+                showAlert = true
+            }
+        }
+    }
+
+
 }
