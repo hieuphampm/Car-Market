@@ -49,7 +49,7 @@ struct CarCardView: View {
         }
         .padding()
         .frame(maxWidth: UIScreen.main.bounds.width - 10)
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.7) 
+        .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
         .background(Color.white)
         .cornerRadius(12)
         .shadow(radius: 4)

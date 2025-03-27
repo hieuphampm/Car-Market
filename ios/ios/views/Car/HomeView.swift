@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = CarViewModel()
     @State private var searchText: String = ""
-    var isFirstLogin: Bool = false  // New parameter to track first login
+    var isFirstLogin: Bool = false
 
     var filteredCars: [Car] {
         if searchText.isEmpty {
@@ -21,10 +21,26 @@ struct HomeView: View {
             }
         }
     }
-	
+
     var body: some View {
         NavigationView {
             VStack {
+                // Updated Profile Navigation Button positioning
+                HStack {
+                    Text("Car Market")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Spacer()
+                    
+                    NavigationLink(destination: ProfileView()) {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.blue)
+                    }
+                }
+                .padding()
+
                 TextField("Finding car...", text: $searchText)
                     .padding()
                     .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -39,7 +55,6 @@ struct HomeView: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 16) {
-                            Text("Total cars: \(filteredCars.count)")
                             if filteredCars.isEmpty {
                                 Text("No cars match your search.")
                                     .foregroundColor(.gray)
@@ -55,15 +70,13 @@ struct HomeView: View {
                     }
                 }
             }
-            .navigationTitle("Car List")
             .navigationBarBackButtonHidden(true)
+            .navigationBarHidden(true)
             .onAppear {
-                print("🔥 HomeView appeared, fetching cars...")
+                print("HomeView appeared, fetching cars...")
                 viewModel.fetchCars()
                 
-                // Optional: Add any first login specific logic
                 if isFirstLogin {
-                    // You can add any first-time login specific actions here
                     print("First login detected")
                 }
             }

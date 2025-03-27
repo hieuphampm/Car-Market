@@ -17,7 +17,7 @@ struct ProfileView: View {
                     .font(.system(size: 80))
                     .foregroundColor(.blue)
                 
-                Text("John Doe")
+                Text("Demo")
                     .font(.title2)
                     .fontWeight(.bold)
                 
