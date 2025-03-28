@@ -9,13 +9,12 @@ import SwiftUI
 struct CarDetailView: View {
     let car: Car
     @State private var isFavorite: Bool = false
+    @State private var showCustomerDetail: Bool = false
     
     var body: some View {
         ZStack {
-            // Main Scroll Content
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Car Image
                     AsyncImage(url: URL(string: car.imageURL)) { phase in
                         switch phase {
                         case .empty:
@@ -43,7 +42,6 @@ struct CarDetailView: View {
                     }
                     .frame(maxWidth: .infinity)
                     
-                    // Car Details
                     VStack(alignment: .leading, spacing: 10) {
                         Text(car.name)
                             .font(.title)
@@ -54,7 +52,6 @@ struct CarDetailView: View {
                             .foregroundColor(.blue)
                             .fontWeight(.semibold)
                         
-                        // Detailed Specs
                         HStack {
                             VStack(alignment: .leading, spacing: 8) {
                                 DetailRow(icon: "calendar", text: "Year: \(car.year)")
@@ -64,7 +61,6 @@ struct CarDetailView: View {
                             }
                         }
                         
-                        // Utilities Section
                         if !car.utilities.isEmpty {
                             Text("Utilities:")
                                 .font(.headline)
@@ -80,7 +76,6 @@ struct CarDetailView: View {
                             }
                         }
                         
-                        // Add padding to bottom to ensure content isn't hidden behind action bar
                         Spacer()
                             .frame(height: 100)
                     }
@@ -88,14 +83,12 @@ struct CarDetailView: View {
                 }
             }
             
-            // Permanent Action Bar
             VStack {
                 Spacer()
                 HStack(spacing: 15) {
-                    // Buy Button
                     Button(action: {
-                        // Implement buy action
-                        print("Buying \(car.name)")
+                        showCustomerDetail = true
+                        print("Buy Now clicked, navigating to CustomerDetailView")
                     }) {
                         Text("Buy Now")
                             .font(.headline)
@@ -106,7 +99,6 @@ struct CarDetailView: View {
                             .cornerRadius(10)
                     }
                     
-                    // Favorite Button
                     Button(action: {
                         isFavorite.toggle()
                         print(isFavorite ? "Added to Favorites" : "Removed from Favorites")
@@ -126,11 +118,16 @@ struct CarDetailView: View {
                 .padding(.bottom, 10)
             }
             .edgesIgnoringSafeArea(.bottom)
+            
+            // Use NavigationLink instead of navigationDestination
+            NavigationLink(destination: CustomerDetailView(car: car), isActive: $showCustomerDetail) {
+                EmptyView()
+            }
         }
+        .navigationTitle("Car Details")
     }
 }
 
-// Helper View for Detail Rows
 struct DetailRow: View {
     let icon: String
     let text: String
@@ -147,13 +144,15 @@ struct DetailRow: View {
 }
 
 #Preview {
-    CarDetailView(car: Car(id: "car_01",
-                           name: "Porsche 911 GT3 Touring",
-                           price: 189000,
-                           engine: "4.0L Flat-6",
-                           year: 2022,
-                           transmission: "Manual (6-Speed)",
-                           utilities: ["Performance-Oriented Driving", "Ceramic Brakes"],
-                           mileage: 4600,
-                           imageURL: "https://via.placeholder.com/250"))
+    NavigationView { // Match HomeView's navigation system
+        CarDetailView(car: Car(id: "car_01",
+                               name: "Porsche 911 GT3 Touring",
+                               price: 189000,
+                               engine: "4.0L Flat-6",
+                               year: 2022,
+                               transmission: "Manual (6-Speed)",
+                               utilities: ["Performance-Oriented Driving", "Ceramic Brakes"],
+                               mileage: 4600,
+                               imageURL: "https://via.placeholder.com/250"))
+    }
 }
