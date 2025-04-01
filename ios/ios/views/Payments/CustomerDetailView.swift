@@ -16,6 +16,8 @@ struct CustomerDetailView: View {
     @State private var address: String = ""
     @State private var showPaymentView: Bool = false
     
+    @Environment(\.presentationMode) var presentationMode
+    
     private let db = Firestore.firestore()
     
     var body: some View {
@@ -43,12 +45,42 @@ struct CustomerDetailView: View {
             }
             .disabled(name.isEmpty || mobilePhone.isEmpty)
             
-            // Use NavigationLink instead of navigationDestination
             NavigationLink(destination: PaymentView(car: car, customerId: generateCustomerId()), isActive: $showPaymentView) {
                 EmptyView()
             }
         }
         .navigationTitle("Customer Details")
+        .onAppear {
+            // Set up notification observers
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name("DismissToCarDetail"),
+                object: nil,
+                queue: .main
+            ) { _ in
+                presentationMode.wrappedValue.dismiss()
+            }
+            
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name("DismissToHomeView"),
+                object: nil,
+                queue: .main
+            ) { _ in
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+        .onDisappear {
+            // Remove observers
+            NotificationCenter.default.removeObserver(
+                self,
+                name: Notification.Name("DismissToCarDetail"),
+                object: nil
+            )
+            NotificationCenter.default.removeObserver(
+                self,
+                name: Notification.Name("DismissToHomeView"),
+                object: nil
+            )
+        }
     }
     
     private func saveCustomerAndProceed() {

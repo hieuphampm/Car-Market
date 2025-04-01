@@ -8,8 +8,15 @@ import SwiftUI
 
 struct CarDetailView: View {
     let car: Car
-    @State private var isFavorite: Bool = false
     @State private var showCustomerDetail: Bool = false
+    @ObservedObject private var favoritesManager = FavoritesManager.shared
+    
+    // Changed to compute isFavorite instead of using @State
+    private var isFavorite: Bool {
+        favoritesManager.isFavorite(car)
+    }
+    
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {
@@ -100,7 +107,8 @@ struct CarDetailView: View {
                     }
                     
                     Button(action: {
-                        isFavorite.toggle()
+                        favoritesManager.toggleFavorite(car)
+                        // No need to toggle state as we're now using a computed property
                         print(isFavorite ? "Added to Favorites" : "Removed from Favorites")
                     }) {
                         Image(systemName: isFavorite ? "heart.fill" : "heart")
@@ -119,12 +127,27 @@ struct CarDetailView: View {
             }
             .edgesIgnoringSafeArea(.bottom)
             
-            // Use NavigationLink instead of navigationDestination
             NavigationLink(destination: CustomerDetailView(car: car), isActive: $showCustomerDetail) {
                 EmptyView()
             }
         }
         .navigationTitle("Car Details")
+        .onAppear {
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name("DismissToHomeView"),
+                object: nil,
+                queue: .main
+            ) { _ in
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+        .onDisappear {
+            NotificationCenter.default.removeObserver(
+                self,
+                name: Notification.Name("DismissToHomeView"),
+                object: nil
+            )
+        }
     }
 }
 
@@ -144,7 +167,7 @@ struct DetailRow: View {
 }
 
 #Preview {
-    NavigationView { // Match HomeView's navigation system
+    NavigationView {
         CarDetailView(car: Car(id: "car_01",
                                name: "Porsche 911 GT3 Touring",
                                price: 189000,

@@ -21,13 +21,16 @@ struct PaymentView: View {
     @State private var cvv: String = ""
     
     @State private var showCardDetailsPopup: Bool = false
+    
+    // Environment variable to access presentation mode
     @Environment(\.presentationMode) var presentationMode
     
     private let db = Firestore.firestore()
     
     var body: some View {
-        GeometryReader { geometry in
+        ZStack {
             VStack {
+                // Header content
                 VStack(spacing: 20) {
                     Text("Payment for \(car.name)")
                         .font(.title2)
@@ -44,17 +47,58 @@ struct PaymentView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
-                    
-                    // Conditional view based on payment method
-                    if selectedMethod == "bank_transfer" {
-                        BankTransferView()
-                    }
-                    
-                    Spacer()
                 }
-                .padding()
                 
-                // Fixed Bottom Button
+                // Scrollable payment method content area
+                ScrollView {
+                    VStack {
+                        if selectedMethod == "bank_transfer" {
+                            BankTransferView()
+                        } else if selectedMethod == "cash" {
+                            VStack(spacing: 15) {
+                                Image(systemName: "banknote")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    .foregroundColor(.green)
+                                
+                                Text("Pay with Cash")
+                                    .font(.headline)
+                                
+                                Text("Please bring the exact amount to our office")
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.secondary)
+                                    .padding()
+                            }
+                            .padding()
+                        } else {
+                            VStack(spacing: 15) {
+                                Image(systemName: "creditcard.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 60)
+                                    .foregroundColor(.blue)
+                                
+                                Text("Pay with Credit/Debit Card")
+                                    .font(.headline)
+                                
+                                Text("Click 'Complete Payment' to enter your card details securely")
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.secondary)
+                                    .padding()
+                            }
+                            .padding()
+                        }
+                    }
+                    .padding(.bottom, 80)
+                }
+                
+                Spacer()
+            }
+            
+            // Fixed Bottom Button
+            VStack {
+                Spacer()
                 Button(action: {
                     if selectedMethod == "card" {
                         showCardDetailsPopup = true
@@ -71,25 +115,26 @@ struct PaymentView: View {
                         .cornerRadius(10)
                 }
                 .padding()
+                .background(Color.white.opacity(0.95))
+                .shadow(radius: 5)
             }
-            .navigationTitle("Payment")
-            .sheet(isPresented: $showCardDetailsPopup) {
-                CardDetailsView(
-                    cardNumber: $cardNumber,
-                    cardHolderName: $cardHolderName,
-                    expiryDate: $expiryDate,
-                    cvv: $cvv,
-                    onSubmit: {
-                        // Basic validation
-                        if !cardNumber.isEmpty && !cardHolderName.isEmpty &&
-                           !expiryDate.isEmpty && !cvv.isEmpty {
-                            processPayment()
-                            showCardDetailsPopup = false
-                        }
+        }
+        .navigationTitle("Payment")
+        .sheet(isPresented: $showCardDetailsPopup) {
+            CardDetailsView(
+                cardNumber: $cardNumber,
+                cardHolderName: $cardHolderName,
+                expiryDate: $expiryDate,
+                cvv: $cvv,
+                onSubmit: {
+                    if !cardNumber.isEmpty && !cardHolderName.isEmpty &&
+                       !expiryDate.isEmpty && !cvv.isEmpty {
+                        processPayment()
+                        showCardDetailsPopup = false
                     }
-                )
-                .presentationDetents([.large])
-            }
+                }
+            )
+            .presentationDetents([.large])
         }
     }
     
@@ -110,8 +155,14 @@ struct PaymentView: View {
                     print("Error saving payment: \(error)")
                 } else {
                     isPaymentComplete = true
-                    // Navigate back to home view
+                    
+                    // Dismiss PaymentView
                     presentationMode.wrappedValue.dismiss()
+                    
+                    // Post notification to dismiss all views back to HomeView
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        NotificationCenter.default.post(name: Notification.Name("DismissToHomeView"), object: nil)
+                    }
                 }
             }
         } catch {
