@@ -9,48 +9,10 @@ import SwiftUI
 
 struct MyCarsView: View {
     @ObservedObject private var favoritesManager = FavoritesManager.shared
-    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
-            // Custom Navigation Bar
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.blue)
-                        Text("Profile")
-                            .foregroundColor(.blue)
-                    }
-                }
-                
-                Spacer()
-                
-                Text("My Cars")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Menu {
-                    Button("Sort by Name") {
-                        sortByName()
-                    }
-                    Button("Sort by Price") {
-                        sortByPrice()
-                    }
-                    Button("Sort by Year") {
-                        sortByYear()
-                    }
-                } label: {
-                    Image(systemName: "arrow.up.arrow.down")
-                        .foregroundColor(.blue)
-                }
-            }
-            .padding()
-            
+            // Cars List Content
             if favoritesManager.favoriteCars.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "heart.slash")
@@ -83,7 +45,25 @@ struct MyCarsView: View {
                 }
             }
         }
-        .navigationBarHidden(true)
+        .navigationTitle("My Cars")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button("Sort by Name") {
+                        sortByName()
+                    }
+                    Button("Sort by Price") {
+                        sortByPrice()
+                    }
+                    Button("Sort by Year") {
+                        sortByYear()
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .foregroundColor(.blue)
+                }
+            }
+        }
     }
     
     private func sortByName() {

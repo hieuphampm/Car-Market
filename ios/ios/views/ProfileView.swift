@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  ios
 //
-//  Created by umtlab03im13 on 19/3/25.
+//  Modified navigation structure with editable name
 //
 
 import SwiftUI
@@ -14,134 +14,179 @@ struct ProfileView: View {
     @ObservedObject private var favoritesManager = FavoritesManager.shared
     @Environment(\.colorScheme) var colorScheme
     
+    @State private var userName: String = "Demo"
+    @State private var isEditingName: Bool = false
+    @State private var tempName: String = "Demo"
+    
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(UIColor.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Profile Header
-                        VStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .fill(LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .purple]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ))
-                                    .frame(width: 100, height: 100)
-                                    .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
-                                
-                                Text("D")
-                                    .font(.system(size: 42, weight: .bold))
-                                    .foregroundColor(.white)
-                            }
+        ZStack {
+            Color(UIColor.systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Profile Header
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(LinearGradient(
+                                    gradient: Gradient(colors: [.blue, .purple]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ))
+                                .frame(width: 100, height: 100)
+                                .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
                             
-                            VStack(spacing: 4) {
-                                Text("Demo")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                
+                            Text(userName.prefix(1))
+                                .font(.system(size: 42, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(spacing: 4) {
+                            if isEditingName {
                                 HStack {
-                                    Image(systemName: "checkmark.seal.fill")
-                                        .foregroundColor(.blue)
-                                    
-                                    Text("Premium Member")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                    TextField("Your Name", text: $tempName)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 8)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .onAppear {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                UIApplication.shared.sendAction(#selector(UIResponder.becomeFirstResponder), to: nil, from: nil, for: nil)
+                                            }
+                                        }
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(20)
+                                .frame(width: 200)
+                                
+                                HStack(spacing: 20) {
+                                    Button("Cancel") {
+                                        isEditingName = false
+                                        tempName = userName // Reset to original name
+                                    }
+                                    .foregroundColor(.red)
+                                    
+                                    Button("Save") {
+                                        if !tempName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                            userName = tempName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                            saveUserName()
+                                            isEditingName = false
+                                        }
+                                    }
+                                    .foregroundColor(.blue)
+                                    .disabled(tempName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                                }
+                                .padding(.top, 8)
+                            } else {
+                                HStack {
+                                    Text(userName)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                    
+                                    Button(action: {
+                                        tempName = userName
+                                        isEditingName = true
+                                    }) {
+                                        Image(systemName: "pencil.circle.fill")
+                                            .foregroundColor(.blue)
+                                            .font(.system(size: 18))
+                                    }
+                                }
                             }
-                        }
-                        .padding(.top, 20)
-                        
-                        // Account Section
-                        SectionCard(title: "Account") {
-                            NavigationLink(destination: MyCarsView()) {
-                                ProfileMenuItem(
-                                    icon: "car.fill",
-                                    iconColor: .blue,
-                                    title: "My Cars",
-                                    badgeCount: favoritesManager.favoriteCars.count
-                                )
-                            }
                             
-                            ProfileMenuItem(
-                                icon: "bell.fill",
-                                iconColor: .orange,
-                                title: "Notifications"
-                            )
-                            
-                            ProfileMenuItem(
-                                icon: "creditcard.fill",
-                                iconColor: .green,
-                                title: "Payment Methods"
-                            )
-                        }
-                        
-                        // Preferences Section
-                        SectionCard(title: "Preferences") {
-                            ProfileMenuItem(
-                                icon: "gear",
-                                iconColor: .gray,
-                                title: "Settings"
-                            )
-                            
-                            ProfileMenuItem(
-                                icon: "questionmark.circle.fill",
-                                iconColor: .purple,
-                                title: "Help & Support"
-                            )
-                            
-                            ProfileMenuItem(
-                                icon: "doc.text.fill",
-                                iconColor: .indigo,
-                                title: "Terms & Privacy"
-                            )
-                        }
-                        
-                        // Sign Out Button
-                        Button(action: signOut) {
                             HStack {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                                Text("Sign Out")
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundColor(.blue)
+                                
+                                Text("Premium Member")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
-                            .font(.headline)
-                            .foregroundColor(.red)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.red, lineWidth: 1.5)
-                                    .background(Color.red.opacity(0.05).cornerRadius(16))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(20)
+                        }
+                    }
+                    .padding(.top, 20)
+                    
+                    // Account Section
+                    SectionCard(title: "Account") {
+                        NavigationLink(destination: MyCarsView()) {
+                            ProfileMenuItem(
+                                icon: "car.fill",
+                                iconColor: .blue,
+                                title: "My Cars",
+                                badgeCount: favoritesManager.favoriteCars.count
                             )
                         }
-                        .padding(.horizontal)
-                        .padding(.top, 10)
-                        .padding(.bottom, 30)
+                        
+                        ProfileMenuItem(
+                            icon: "creditcard.fill",
+                            iconColor: .green,
+                            title: "Payment Methods"
+                        )
+                    }
+                    
+                    // Preferences Section
+                    SectionCard(title: "Preferences") {
+                        ProfileMenuItem(
+                            icon: "gear",
+                            iconColor: .gray,
+                            title: "Settings"
+                        )
+                        
+                        ProfileMenuItem(
+                            icon: "questionmark.circle.fill",
+                            iconColor: .purple,
+                            title: "Help & Support"
+                        )
+                        
+                        ProfileMenuItem(
+                            icon: "doc.text.fill",
+                            iconColor: .indigo,
+                            title: "Terms & Privacy"
+                        )
+                    }
+                    
+                    // Sign Out Button
+                    Button(action: signOut) {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                            Text("Sign Out")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.red)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.red, lineWidth: 1.5)
+                                .background(Color.red.opacity(0.05).cornerRadius(16))
+                        )
                     }
                     .padding(.horizontal)
+                    .padding(.top, 10)
+                    .padding(.bottom, 30)
                 }
+                .padding(.horizontal)
             }
-            .navigationTitle("Profile")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        // Edit profile action
-                    }) {
-                        Image(systemName: "pencil")
-                            .foregroundColor(.blue)
-                    }
-                }
+        }
+        .navigationTitle("Profile")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+//                Button(action: {
+//                }) {
+//                    Image(systemName: "pencil")
+//                        .foregroundColor(.blue)
+//                }
             }
         }
         .fullScreenCover(isPresented: $navigateToAuth) {
             AuthenticationView()
+        }
+        .onAppear {
+            loadUserName()
         }
     }
     
@@ -153,8 +198,22 @@ struct ProfileView: View {
             print("Error signing out: \(error.localizedDescription)")
         }
     }
+    
+    func saveUserName() {
+        UserDefaults.standard.set(userName, forKey: "userName")
+        print("Saved user name: \(userName)")
+    }
+    
+    func loadUserName() {
+        if let savedName = UserDefaults.standard.string(forKey: "userName") {
+            userName = savedName
+            tempName = savedName
+            print("Loaded user name: \(userName)")
+        }
+    }
 }
 
+// Supporting view structures
 struct SectionCard<Content: View>: View {
     let title: String
     let content: Content
@@ -231,5 +290,7 @@ struct ProfileMenuItem: View {
 }
 
 #Preview {
-    ProfileView()
+    NavigationView {
+        ProfileView()
+    }
 }
