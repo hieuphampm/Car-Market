@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseAuth
+import PhotosUI
 
 struct ProfileView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -18,6 +19,11 @@ struct ProfileView: View {
     @State private var isEditingName: Bool = false
     @State private var tempName: String = "Demo"
     
+    // Image picker and profile image states
+    @State private var profileImage: UIImage?
+    @State private var isShowingImagePicker = false
+    @State private var photoItem: PhotosPickerItem?
+    
     var body: some View {
         ZStack {
             Color(UIColor.systemGroupedBackground)
@@ -28,18 +34,46 @@ struct ProfileView: View {
                     // Profile Header
                     VStack(spacing: 16) {
                         ZStack {
-                            Circle()
-                                .fill(LinearGradient(
-                                    gradient: Gradient(colors: [.blue, .purple]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ))
-                                .frame(width: 100, height: 100)
-                                .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
+                            if let profileImage = profileImage {
+                                Image(uiImage: profileImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(Circle())
+                                    .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
+                            } else {
+                                Circle()
+                                    .fill(LinearGradient(
+                                        gradient: Gradient(colors: [.blue, .purple]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ))
+                                    .frame(width: 100, height: 100)
+                                    .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
+                                
+                                Text(userName.prefix(1))
+                                    .font(.system(size: 42, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
                             
-                            Text(userName.prefix(1))
-                                .font(.system(size: 42, weight: .bold))
-                                .foregroundColor(.white)
+                            // Camera button overlay
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    PhotosPicker(selection: $photoItem, matching: .images) {
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .padding(8)
+                                            .background(Color.blue)
+                                            .clipShape(Circle())
+                                            .shadow(radius: 3)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .frame(width: 100, height: 100)
                         }
                         
                         VStack(spacing: 4) {
@@ -186,8 +220,20 @@ struct ProfileView: View {
         .fullScreenCover(isPresented: $navigateToAuth) {
             AuthenticationView()
         }
+        .onChange(of: photoItem) { newItem in
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    await MainActor.run {
+                        profileImage = uiImage
+                        saveProfileImage(uiImage)
+                    }
+                }
+            }
+        }
         .onAppear {
             loadUserName()
+            loadProfileImage()
         }
     }
     
@@ -210,6 +256,23 @@ struct ProfileView: View {
             userName = savedName
             tempName = savedName
             print("Loaded user name: \(userName)")
+        }
+    }
+    
+    // Save profile image to local storage
+    func saveProfileImage(_ image: UIImage) {
+        if let imageData = image.jpegData(compressionQuality: 0.8) {
+            UserDefaults.standard.set(imageData, forKey: "profileImage")
+            print("Profile image saved")
+        }
+    }
+    
+    // Load profile image from local storage
+    func loadProfileImage() {
+        if let imageData = UserDefaults.standard.data(forKey: "profileImage"),
+           let savedImage = UIImage(data: imageData) {
+            profileImage = savedImage
+            print("Profile image loaded")
         }
     }
 }
