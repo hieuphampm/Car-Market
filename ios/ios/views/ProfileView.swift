@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  ios
 //
-//  Modified navigation structure with editable name
+// Created by umtlab03im13 on 28/3/25.
 //
 
 import SwiftUI
@@ -62,7 +62,7 @@ struct ProfileView: View {
                                 HStack(spacing: 20) {
                                     Button("Cancel") {
                                         isEditingName = false
-                                        tempName = userName // Reset to original name
+                                        tempName = userName
                                     }
                                     .foregroundColor(.red)
                                     
@@ -175,11 +175,12 @@ struct ProfileView: View {
         .navigationTitle("Profile")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-//                Button(action: {
-//                }) {
-//                    Image(systemName: "pencil")
-//                        .foregroundColor(.blue)
-//                }
+                // Commented out toolbar button
+                // Button(action: {
+                // }) {
+                //     Image(systemName: "pencil")
+                //         .foregroundColor(.blue)
+                // }
             }
         }
         .fullScreenCover(isPresented: $navigateToAuth) {
@@ -260,6 +261,7 @@ struct ProfileMenuItem: View {
             
             Text(title)
                 .font(.system(size: 16))
+                .foregroundColor(.black) // Changed text color to black
             
             Spacer()
             
@@ -273,10 +275,6 @@ struct ProfileMenuItem: View {
                     .background(Color.blue)
                     .clipShape(Capsule())
             }
-            
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14))
-                .foregroundColor(.gray)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)

@@ -43,7 +43,7 @@ struct CarCardView: View {
                 .font(.headline)
                 .foregroundColor(.black)
 
-            Text("$\(car.price, specifier: "%.2f")")
+            Text("$\(car.price, specifier: "%.f")")
                 .font(.subheadline)
                 .foregroundColor(.gray)
         }
