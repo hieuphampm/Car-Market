@@ -10,13 +10,12 @@ struct CarDetailView: View {
     let car: Car
     @State private var showCustomerDetail: Bool = false
     @ObservedObject private var favoritesManager = FavoritesManager.shared
+    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(\.presentationMode) var presentationMode
     
-    // Changed to compute isFavorite instead of using @State
     private var isFavorite: Bool {
         favoritesManager.isFavorite(car)
     }
-    
-    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {
@@ -48,17 +47,14 @@ struct CarDetailView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    
                     VStack(alignment: .leading, spacing: 10) {
                         Text(car.name)
                             .font(.title)
                             .fontWeight(.bold)
-                        
                         Text("Price: $\(car.price, specifier: "%.2f")")
                             .font(.title2)
                             .foregroundColor(.blue)
                             .fontWeight(.semibold)
-                        
                         HStack {
                             VStack(alignment: .leading, spacing: 8) {
                                 DetailRow(icon: "calendar", text: "Year: \(car.year)")
@@ -67,12 +63,10 @@ struct CarDetailView: View {
                                 DetailRow(icon: "gear", text: "Transmission: \(car.transmission)")
                             }
                         }
-                        
                         if !car.utilities.isEmpty {
                             Text("Utilities:")
                                 .font(.headline)
                                 .padding(.top, 8)
-                            
                             ForEach(car.utilities, id: \.self) { utility in
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
@@ -82,20 +76,17 @@ struct CarDetailView: View {
                                 }
                             }
                         }
-                        
                         Spacer()
                             .frame(height: 100)
                     }
                     .padding()
                 }
             }
-            
             VStack {
                 Spacer()
                 HStack(spacing: 15) {
                     Button(action: {
                         showCustomerDetail = true
-                        print("Buy Now clicked, navigating to CustomerDetailView")
                     }) {
                         Text("Buy Now")
                             .font(.headline)
@@ -105,11 +96,8 @@ struct CarDetailView: View {
                             .background(Color.blue)
                             .cornerRadius(10)
                     }
-                    
                     Button(action: {
                         favoritesManager.toggleFavorite(car)
-                        // No need to toggle state as we're now using a computed property
-                        print(isFavorite ? "Added to Favorites" : "Removed from Favorites")
                     }) {
                         Image(systemName: isFavorite ? "heart.fill" : "heart")
                             .foregroundColor(isFavorite ? .red : .gray)
@@ -126,28 +114,12 @@ struct CarDetailView: View {
                 .padding(.bottom, 10)
             }
             .edgesIgnoringSafeArea(.bottom)
-            
             NavigationLink(destination: CustomerDetailView(car: car), isActive: $showCustomerDetail) {
                 EmptyView()
             }
         }
         .navigationTitle("Car Details")
-        .onAppear {
-            NotificationCenter.default.addObserver(
-                forName: Notification.Name("DismissToHomeView"),
-                object: nil,
-                queue: .main
-            ) { _ in
-                presentationMode.wrappedValue.dismiss()
-            }
-        }
-        .onDisappear {
-            NotificationCenter.default.removeObserver(
-                self,
-                name: Notification.Name("DismissToHomeView"),
-                object: nil
-            )
-        }
+        .environmentObject(navigationManager)
     }
 }
 

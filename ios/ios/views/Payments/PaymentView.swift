@@ -13,16 +13,12 @@ struct PaymentView: View {
     let customerId: String
     @State private var selectedMethod: String = "card"
     @State private var isPaymentComplete: Bool = false
-    
-    // Card details
     @State private var cardNumber: String = ""
     @State private var cardHolderName: String = ""
     @State private var expiryDate: String = ""
     @State private var cvv: String = ""
-    
     @State private var showCardDetailsPopup: Bool = false
-    
-    // Environment variable to access presentation mode
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.presentationMode) var presentationMode
     
     private let db = Firestore.firestore()
@@ -30,16 +26,13 @@ struct PaymentView: View {
     var body: some View {
         ZStack {
             VStack {
-                // Header content
                 VStack(spacing: 20) {
                     Text("Payment for \(car.name)")
                         .font(.title2)
                         .fontWeight(.bold)
-                    
                     Text("Amount: $\(car.price, specifier: "%.2f")")
                         .font(.title3)
                         .foregroundColor(.blue)
-                    
                     Picker("Payment Method", selection: $selectedMethod) {
                         Text("Credit/Debit Card").tag("card")
                         Text("Bank Transfer").tag("bank_transfer")
@@ -48,8 +41,6 @@ struct PaymentView: View {
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
                 }
-                
-                // Scrollable payment method content area
                 ScrollView {
                     VStack {
                         if selectedMethod == "bank_transfer" {
@@ -61,10 +52,8 @@ struct PaymentView: View {
                                     .scaledToFit()
                                     .frame(width: 100, height: 100)
                                     .foregroundColor(.green)
-                                
                                 Text("Pay with Cash")
                                     .font(.headline)
-                                
                                 Text("Please bring the exact amount to our office")
                                     .multilineTextAlignment(.center)
                                     .foregroundColor(.secondary)
@@ -78,10 +67,8 @@ struct PaymentView: View {
                                     .scaledToFit()
                                     .frame(width: 100, height: 60)
                                     .foregroundColor(.blue)
-                                
                                 Text("Pay with Credit/Debit Card")
                                     .font(.headline)
-                                
                                 Text("Click 'Complete Payment' to enter your card details securely")
                                     .multilineTextAlignment(.center)
                                     .foregroundColor(.secondary)
@@ -92,11 +79,8 @@ struct PaymentView: View {
                     }
                     .padding(.bottom, 80)
                 }
-                
                 Spacer()
             }
-            
-            // Fixed Bottom Button
             VStack {
                 Spacer()
                 Button(action: {
@@ -148,21 +132,13 @@ struct PaymentView: View {
             method: selectedMethod,
             timestamp: Date()
         )
-        
         do {
             try db.collection("payments").document(paymentId).setData(from: payment) { error in
                 if let error = error {
                     print("Error saving payment: \(error)")
                 } else {
                     isPaymentComplete = true
-                    
-                    // Dismiss PaymentView
-                    presentationMode.wrappedValue.dismiss()
-                    
-                    // Post notification to dismiss all views back to HomeView
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        NotificationCenter.default.post(name: Notification.Name("DismissToHomeView"), object: nil)
-                    }
+                    navigationManager.resetToHome()
                 }
             }
         } catch {
