@@ -38,9 +38,9 @@
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\Car-Market\\MarketAPI\\API\\ConsoleApp\\Program.cs",
               "RelativeDocumentMoniker": "ConsoleApp\\Program.cs",
-              "ToolTip": "E:\\Car-Market\\MarketAPI\\API\\ConsoleApp\\Program.cs*",
-              "RelativeToolTip": "ConsoleApp\\Program.cs*",
-              "ViewState": "AgIAACMBAAAAAAAAAAAAAEcBAAABAAAAAAAAAA==",
+              "ToolTip": "E:\\Car-Market\\MarketAPI\\API\\ConsoleApp\\Program.cs",
+              "RelativeToolTip": "ConsoleApp\\Program.cs",
+              "ViewState": "AgIAACQBAAAAAAAAAAAiwEcBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-07T00:58:34.839Z",
               "EditorCaption": ""
@@ -55,8 +55,7 @@
               "RelativeToolTip": "ClassLibrary\\Models\\CarMarketDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-07T00:53:57.926Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-07T00:53:57.926Z"
             },
             {
               "$type": "Document",
@@ -68,8 +67,7 @@
               "RelativeToolTip": "ClassLibrary\\Models\\CarImage.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-07T00:53:56.708Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-07T00:53:56.708Z"
             }
           ]
         }
