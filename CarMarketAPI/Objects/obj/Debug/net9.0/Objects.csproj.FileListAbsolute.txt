@@ -1,0 +1,15 @@
+E:\Car-Market\CarMarketAPI\Objects\bin\Debug\net9.0\Objects.deps.json
+E:\Car-Market\CarMarketAPI\Objects\bin\Debug\net9.0\Objects.runtimeconfig.json
+E:\Car-Market\CarMarketAPI\Objects\bin\Debug\net9.0\Objects.dll
+E:\Car-Market\CarMarketAPI\Objects\bin\Debug\net9.0\Objects.pdb
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.csproj.AssemblyReference.cache
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.GeneratedMSBuildEditorConfig.editorconfig
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.AssemblyInfoInputs.cache
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.AssemblyInfo.cs
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.csproj.CoreCompileInputs.cache
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.sourcelink.json
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.dll
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\refint\Objects.dll
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.pdb
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\Objects.genruntimeconfig.cache
+E:\Car-Market\CarMarketAPI\Objects\obj\Debug\net9.0\ref\Objects.dll
