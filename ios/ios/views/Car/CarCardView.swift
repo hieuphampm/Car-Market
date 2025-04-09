@@ -38,11 +38,9 @@ struct CarCardView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-
             Text(car.name)
                 .font(.headline)
                 .foregroundColor(.black)
-
             Text("$\(car.price, specifier: "%.f")")
                 .font(.subheadline)
                 .foregroundColor(.gray)
@@ -55,7 +53,6 @@ struct CarCardView: View {
         .shadow(radius: 4)
     }
 }
-
 
 #Preview {
     CarCardView(car: Car(id: "car_01", name: "Porsche 911 GT3 Touring", price: 189000, engine: "4.0L Flat-6", year: 2022, transmission: "Manual (6-Speed)", utilities: ["Performance-Oriented Driving"], mileage: 4600, imageURL: "https://via.placeholder.com/150"))

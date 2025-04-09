@@ -9,11 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = CarViewModel()
+    @EnvironmentObject var navigationManager: NavigationManager
     @State private var searchText: String = ""
     @State private var sortOption: SortOption = .none
+    @State private var isActive: Bool = false // To control navigation reset
     var isFirstLogin: Bool = false
     
-    // Enum to handle different sorting options
     enum SortOption {
         case none
         case nameAscending
@@ -38,7 +39,6 @@ struct HomeView: View {
         let filtered = searchText.isEmpty ? viewModel.cars : viewModel.cars.filter { car in
             car.name.lowercased().contains(searchText.lowercased())
         }
-        
         switch sortOption {
         case .none:
             return filtered
@@ -57,114 +57,109 @@ struct HomeView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                // Updated Profile Navigation Button positioning
-                HStack {
-                    Text("Car Market")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-                    NavigationLink(destination: ProfileView()) {
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(.blue)
-                    }
-                }
-                .padding()
-
-                // Search and Sort Bar
-                VStack(spacing: 12) {
-                    TextField("Finding car...", text: $searchText)
-                        .padding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
+            ZStack {
+                VStack {
                     HStack {
-                        Text("Sort by:")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        
-                        Picker("Sort by", selection: $sortOption) {
-                            Text("Default").tag(SortOption.none)
-                            Text("Name (A-Z)").tag(SortOption.nameAscending)
-                            Text("Price ↑").tag(SortOption.priceAscending)
-                            Text("Price ↓").tag(SortOption.priceDescending)
-                            Text("Mileage ↑").tag(SortOption.mileageAscending)
-                            Text("Mileage ↓").tag(SortOption.mileageDescending)
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        
+                        Text("Car Market")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
                         Spacer()
-                        
-                        // Selected sort option display
-                        if sortOption != .none {
-                            HStack(spacing: 4) {
-                                Text(sortOption.displayText)
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                
-                                Button(action: {
-                                    sortOption = .none
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.white.opacity(0.8))
-                                        .font(.caption)
-                                }
-                            }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.blue)
-                            .cornerRadius(12)
+                        NavigationLink(destination: ProfileView()) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.blue)
                         }
                     }
-                    .padding(.horizontal)
-                }
-
-                if viewModel.isLoading {
-                    ProgressView("Loading cars...")
-                        .padding()
-                } else if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .padding()
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            if sortedAndFilteredCars.isEmpty {
-                                Text("No cars match your search.")
-                                    .foregroundColor(.gray)
-                                    .padding(.top, 40)
-                            } else {
-                                // Results counter
-                                HStack {
-                                    Text("\(sortedAndFilteredCars.count) cars found")
+                    .padding()
+                    VStack(spacing: 12) {
+                        TextField("Finding car...", text: $searchText)
+                            .padding()
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        HStack {
+                            Text("Sort by:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Picker("Sort by", selection: $sortOption) {
+                                Text("Default").tag(SortOption.none)
+                                Text("Name (A-Z)").tag(SortOption.nameAscending)
+                                Text("Price ↑").tag(SortOption.priceAscending)
+                                Text("Price ↓").tag(SortOption.priceDescending)
+                                Text("Mileage ↑").tag(SortOption.mileageAscending)
+                                Text("Mileage ↓").tag(SortOption.mileageDescending)
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            Spacer()
+                            if sortOption != .none {
+                                HStack(spacing: 4) {
+                                    Text(sortOption.displayText)
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Spacer()
+                                        .foregroundColor(.white)
+                                    Button(action: {
+                                        sortOption = .none
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.white.opacity(0.8))
+                                            .font(.caption)
+                                    }
                                 }
-                                .padding(.horizontal)
-                                
-                                ForEach(sortedAndFilteredCars) { car in
-                                    NavigationLink(destination: CarDetailView(car: car)) {
-                                        CarCardView(car: car)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue)
+                                .cornerRadius(12)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    if viewModel.isLoading {
+                        ProgressView("Loading cars...")
+                            .padding()
+                    } else if let error = viewModel.errorMessage {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .padding()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 16) {
+                                if sortedAndFilteredCars.isEmpty {
+                                    Text("No cars match your search.")
+                                        .foregroundColor(.gray)
+                                        .padding(.top, 40)
+                                } else {
+                                    HStack {
+                                        Text("\(sortedAndFilteredCars.count) cars found")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal)
+                                    ForEach(sortedAndFilteredCars) { car in
+                                        NavigationLink(
+                                            destination: CarDetailView(car: car),
+                                            isActive: Binding(
+                                                get: { isActive && !navigationManager.shouldNavigateToHome },
+                                                set: { isActive = $0 }
+                                            )
+                                        ) {
+                                            CarCardView(car: car)
+                                        }
                                     }
                                 }
                             }
+                            .padding()
                         }
-                        .padding()
+                    }
+                }
+                .navigationBarHidden(true)
+                .onAppear {
+                    viewModel.fetchCars()
+                }
+                .onChange(of: navigationManager.shouldNavigateToHome) { shouldNavigate in
+                    if shouldNavigate {
+                        isActive = false // Reset navigation stack
                     }
                 }
             }
-            .navigationBarHidden(true)
-            .onAppear {
-                print("HomeView appeared, fetching cars...")
-                viewModel.fetchCars()
-                
-                if isFirstLogin {
-                    print("First login detected")
-                }
-            }
+            .environmentObject(navigationManager)
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

@@ -12,10 +12,8 @@ struct BankTransferView: View {
         VStack(spacing: 15) {
             Text("Bank Transfer")
                 .font(.headline)
-            
             Text("Scan QR Code to Complete Payment")
                 .font(.subheadline)
-            
             Image(systemName: "qrcode")
                 .resizable()
                 .scaledToFit()
@@ -25,11 +23,9 @@ struct BankTransferView: View {
                     Rectangle()
                         .stroke(Color.blue, lineWidth: 2)
                 )
-            
             Text("Account Details:")
                 .font(.subheadline)
                 .fontWeight(.bold)
-            
             Text("Bank: Sample Bank")
                 .font(.caption)
             Text("Account Number: 1234 5678 9012")

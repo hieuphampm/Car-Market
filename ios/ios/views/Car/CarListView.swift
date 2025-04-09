@@ -37,14 +37,12 @@ struct CarListView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-
                         TextField("Search by model...", text: $searchText)
                             .padding(8)
                             .background(Color(.systemGray6))
                             .cornerRadius(10)
                     }
                     .padding(.horizontal)
-
                     List(filteredCars) { car in
                         NavigationLink(destination: CarDetailView(car: car)) {
                             CarCardView(car: car)

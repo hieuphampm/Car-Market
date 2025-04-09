@@ -15,7 +15,7 @@ struct CustomerDetailView: View {
     @State private var email: String = ""
     @State private var address: String = ""
     @State private var showPaymentView: Bool = false
-    
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.presentationMode) var presentationMode
     
     private let db = Firestore.firestore()
@@ -33,7 +33,6 @@ struct CustomerDetailView: View {
                 TextField("Address (Optional)", text: $address)
                     .textContentType(.streetAddressLine1)
             }
-            
             Button(action: saveCustomerAndProceed) {
                 Text("Continue to Payment")
                     .font(.headline)
@@ -44,43 +43,12 @@ struct CustomerDetailView: View {
                     .cornerRadius(10)
             }
             .disabled(name.isEmpty || mobilePhone.isEmpty)
-            
             NavigationLink(destination: PaymentView(car: car, customerId: generateCustomerId()), isActive: $showPaymentView) {
                 EmptyView()
             }
         }
         .navigationTitle("Customer Details")
-        .onAppear {
-            // Set up notification observers
-            NotificationCenter.default.addObserver(
-                forName: Notification.Name("DismissToCarDetail"),
-                object: nil,
-                queue: .main
-            ) { _ in
-                presentationMode.wrappedValue.dismiss()
-            }
-            
-            NotificationCenter.default.addObserver(
-                forName: Notification.Name("DismissToHomeView"),
-                object: nil,
-                queue: .main
-            ) { _ in
-                presentationMode.wrappedValue.dismiss()
-            }
-        }
-        .onDisappear {
-            // Remove observers
-            NotificationCenter.default.removeObserver(
-                self,
-                name: Notification.Name("DismissToCarDetail"),
-                object: nil
-            )
-            NotificationCenter.default.removeObserver(
-                self,
-                name: Notification.Name("DismissToHomeView"),
-                object: nil
-            )
-        }
+        .environmentObject(navigationManager)
     }
     
     private func saveCustomerAndProceed() {
@@ -92,7 +60,6 @@ struct CustomerDetailView: View {
             email: email.isEmpty ? nil : email,
             address: address.isEmpty ? nil : address
         )
-        
         do {
             try db.collection("customers").document(customerId).setData(from: customer) { error in
                 if let error = error {
