@@ -1,3 +1,9 @@
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.csproj.AssemblyReference.cache
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.GeneratedMSBuildEditorConfig.editorconfig
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.AssemblyInfoInputs.cache
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.AssemblyInfo.cs
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.csproj.CoreCompileInputs.cache
+E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.sourcelink.json
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\ConsoleApp.exe
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\ConsoleApp.deps.json
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\ConsoleApp.runtimeconfig.json
@@ -55,12 +61,6 @@ E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\runtimes\win\lib\net6.0\
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\ClassLibrary.dll
 E:\Car-Market\MarketAPI\API\ConsoleApp\bin\Debug\net9.0\ClassLibrary.pdb
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.csproj.AssemblyReference.cache
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.GeneratedMSBuildEditorConfig.editorconfig
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.AssemblyInfoInputs.cache
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.AssemblyInfo.cs
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.csproj.CoreCompileInputs.cache
-E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.sourcelink.json
 E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.csproj.Up2Date
 E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\ConsoleApp.dll
 E:\Car-Market\MarketAPI\API\ConsoleApp\obj\Debug\net9.0\refint\ConsoleApp.dll

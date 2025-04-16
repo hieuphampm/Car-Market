@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Linq;
 using ClassLibrary.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace CarMarketConsoleApp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             while (true)
             {
@@ -40,18 +40,6 @@ namespace CarMarketConsoleApp
                         break;
                 }
             }
-        }
-
-        static T FindById<T>(int id, Func<CarMarketDbContext, IQueryable<T>> querySelector, string entityName) where T : class
-        {
-            using var db = new CarMarketDbContext();
-            var entity = querySelector(db).FirstOrDefault(e => EF.Property<int>(e, entityName + "Id") == id);
-            if (entity == null)
-            {
-                Console.WriteLine($"{entityName} with ID {id} not found!");
-                return null;
-            }
-            return entity;
         }
 
         static void ManageCustomers()
@@ -92,7 +80,7 @@ namespace CarMarketConsoleApp
                         Console.WriteLine("Customer added successfully!");
                         break;
                     case "3":
-                        PrintAndEdit(db.Customers, "Customer", c => $"{c.FirstName} {c.LastName}",
+                        PrintAndEdit(db.Customers.AsQueryable(), "Customer", c => $"{c.FirstName} {c.LastName}",
                             c =>
                             {
                                 c.FirstName = GetInput("First Name", c.FirstName);
@@ -100,7 +88,7 @@ namespace CarMarketConsoleApp
                                 c.Email = GetInput("Email", c.Email);
                                 c.PhoneNumber = GetInput("Phone Number", c.PhoneNumber);
                                 c.Address = GetInput("Address", c.Address);
-                            });
+                            }, db);
                         break;
                     case "4":
                         PrintAndDelete(db.Customers, "Customer", c => $"{c.FirstName} {c.LastName}");
@@ -124,7 +112,6 @@ namespace CarMarketConsoleApp
 
         static void ManageCars()
         {
-            using var db = new CarMarketDbContext();
             while (true)
             {
                 Console.Clear();
@@ -142,46 +129,267 @@ namespace CarMarketConsoleApp
                 switch (choice)
                 {
                     case "1":
-                        var cars = db.Cars.Include(c => c.Model).ToList();
-                        foreach (var c in cars)
-                            Console.WriteLine($"{c.CarId}: {c.Model.ModelName} ({c.Year}) - ${c.Price}");
+                        using (var db = new CarMarketDbContext())
+                        {
+                            var cars = db.Cars.Include(c => c.Model).ToList();
+                            foreach (var c in cars)
+                                Console.WriteLine($"{c.CarId}: {(c.Model != null ? c.Model.ModelName : "Unknown Model")} ({c.Year}) - ${c.Price}");
+                        }
                         break;
                     case "2":
-                        var newCar = new Car
+                        using (var db = new CarMarketDbContext())
                         {
-                            ModelId = int.Parse(GetInput("Model ID")),
-                            Year = int.Parse(GetInput("Year")),
-                            Price = decimal.Parse(GetInput("Price")),
-                            Mileage = int.Parse(GetInput("Mileage")),
-                            TransmissionTypeId = int.Parse(GetInput("Transmission Type ID")),
-                            FuelTypeId = int.Parse(GetInput("Fuel Type ID")),
-                            ColorId = int.Parse(GetInput("Color ID")),
-                            Vin = GetInput("VIN")
-                        };
-                        db.Cars.Add(newCar);
-                        db.SaveChanges();
-                        Console.WriteLine("Car added successfully!");
+                            try
+                            {
+                                // Prompt for Car Model selection or creation
+                                Console.WriteLine("Do you want to (1) Select an existing Car Model or (2) Create a new Car Model?");
+                                Console.Write("Enter 1 or 2: ");
+                                string modelChoice = Console.ReadLine();
+                                int modelId;
+
+                                if (modelChoice == "2")
+                                {
+                                    // Create a new Car Model
+                                    Console.WriteLine("Creating a new Car Model...");
+
+                                    // Display and validate Manufacturers
+                                    Console.WriteLine("Available Manufacturers:");
+                                    var manufacturers = db.Manufacturers.ToList();
+                                    if (!manufacturers.Any())
+                                    {
+                                        Console.WriteLine("No manufacturers available. Please add a manufacturer first.");
+                                        break;
+                                    }
+                                    foreach (var manuf in manufacturers)
+                                        Console.WriteLine($"{manuf.ManufacturerId}: {manuf.Name}");
+                                    int manufacturerId = GetValidIntInput("Manufacturer ID", id => db.Manufacturers.Any(m => m.ManufacturerId == id));
+
+                                    // Collect Car Model details
+                                    string modelName = GetInput("Model Name");
+                                    if (string.IsNullOrEmpty(modelName))
+                                    {
+                                        Console.WriteLine("Model Name is required.");
+                                        break;
+                                    }
+
+                                    string category = GetInput("Category (optional)", null);
+
+                                    Console.Write("Enter First Production Year (optional): ");
+                                    int? firstProductionYear = null;
+                                    if (int.TryParse(Console.ReadLine(), out int fpy))
+                                        firstProductionYear = fpy;
+
+                                    Console.Write("Enter Last Production Year (optional): ");
+                                    int? lastProductionYear = null;
+                                    if (int.TryParse(Console.ReadLine(), out int lpy))
+                                        lastProductionYear = lpy;
+
+                                    // Create and save new Car Model
+                                    var newModel = new CarModel
+                                    {
+                                        ManufacturerId = manufacturerId,
+                                        ModelName = modelName,
+                                        Category = category,
+                                        FirstProductionYear = firstProductionYear,
+                                        LastProductionYear = lastProductionYear,
+                                        DateCreated = DateTime.Now
+                                    };
+
+                                    db.CarModels.Add(newModel);
+                                    db.SaveChanges();
+                                    modelId = newModel.ModelId;
+                                    Console.WriteLine($"New Car Model '{modelName}' added with ID: {modelId}");
+                                }
+                                else
+                                {
+                                    // Select existing Car Model
+                                    Console.WriteLine("Available Car Models:");
+                                    var models = db.CarModels.ToList();
+                                    if (!models.Any())
+                                    {
+                                        Console.WriteLine("No car models available. Please create a new model.");
+                                        break;
+                                    }
+                                    foreach (var model in models)
+                                        Console.WriteLine($"{model.ModelId}: {model.ModelName}");
+                                    modelId = GetValidIntInput("Model ID", id => db.CarModels.Any(m => m.ModelId == id));
+                                }
+
+                                // Display and validate Transmission Types
+                                Console.WriteLine("Available Transmission Types:");
+                                var transmissions = db.TransmissionTypes.ToList();
+                                if (!transmissions.Any())
+                                {
+                                    Console.WriteLine("No transmission types available. Please add a transmission type first.");
+                                    break;
+                                }
+                                foreach (var trans in transmissions)
+                                    Console.WriteLine($"{trans.TransmissionTypeId}: {trans.Name}");
+                                int transmissionTypeId = GetValidIntInput("Transmission Type ID", id => db.TransmissionTypes.Any(t => t.TransmissionTypeId == id));
+
+                                // Display and validate Fuel Types
+                                Console.WriteLine("Available Fuel Types:");
+                                var fuels = db.FuelTypes.ToList();
+                                if (!fuels.Any())
+                                {
+                                    Console.WriteLine("No fuel types available. Please add a fuel type first.");
+                                    break;
+                                }
+                                foreach (var fuel in fuels)
+                                    Console.WriteLine($"{fuel.FuelTypeId}: {fuel.Name}");
+                                int fuelTypeId = GetValidIntInput("Fuel Type ID", id => db.FuelTypes.Any(f => f.FuelTypeId == id));
+
+                                // Display and validate Colors
+                                Console.WriteLine("Available Colors:");
+                                var colors = db.Colors.ToList();
+                                if (!colors.Any())
+                                {
+                                    Console.WriteLine("No colors available. Please add a color first.");
+                                    break;
+                                }
+                                foreach (var color in colors)
+                                    Console.WriteLine($"{color.ColorId}: {color.Name}");
+                                int colorId = GetValidIntInput("Color ID", id => db.Colors.Any(c => c.ColorId == id));
+
+                                // Collect required fields
+                                Console.Write("Enter Year: ");
+                                if (!int.TryParse(Console.ReadLine(), out int year) || year < 1886 || year > DateTime.Now.Year + 1)
+                                {
+                                    Console.WriteLine("Invalid Year. Please enter a valid year.");
+                                    break;
+                                }
+
+                                Console.Write("Enter Price: ");
+                                if (!decimal.TryParse(Console.ReadLine(), out decimal price) || price < 0)
+                                {
+                                    Console.WriteLine("Invalid Price. Please enter a valid positive number.");
+                                    break;
+                                }
+
+                                Console.Write("Enter Mileage: ");
+                                if (!int.TryParse(Console.ReadLine(), out int mileage) || mileage < 0)
+                                {
+                                    Console.WriteLine("Invalid Mileage. Please enter a valid non-negative number.");
+                                    break;
+                                }
+
+                                string vin = GetInput("VIN (optional)", null);
+
+                                // Collect optional fields
+                                Console.Write("Enter Engine Size (liters, optional): ");
+                                decimal? engineSize = null;
+                                if (decimal.TryParse(Console.ReadLine(), out decimal es))
+                                    engineSize = es;
+
+                                Console.Write("Enter Horsepower (optional): ");
+                                int? horsepower = null;
+                                if (int.TryParse(Console.ReadLine(), out int hp))
+                                    horsepower = hp;
+
+                                Console.Write("Enter Number of Doors (optional): ");
+                                int? numberOfDoors = null;
+                                if (int.TryParse(Console.ReadLine(), out int doors))
+                                    numberOfDoors = doors;
+
+                                string description = GetInput("Description (optional)", null);
+
+                                // Create new Car entity
+                                var newCar = new Car
+                                {
+                                    ModelId = modelId,
+                                    Year = year,
+                                    Price = price,
+                                    Mileage = mileage,
+                                    TransmissionTypeId = transmissionTypeId,
+                                    FuelTypeId = fuelTypeId,
+                                    ColorId = colorId,
+                                    Vin = string.IsNullOrEmpty(vin) ? null : vin,
+                                    EngineSize = engineSize,
+                                    Horsepower = horsepower,
+                                    NumberOfDoors = numberOfDoors,
+                                    Description = description,
+                                    IsAvailable = true,
+                                    DateCreated = DateTime.Now,
+                                    DateAdded = DateTime.Now
+                                };
+
+                                db.Cars.Add(newCar);
+                                db.SaveChanges();
+                                Console.WriteLine($"Car added successfully with ID: {newCar.CarId}");
+                            }
+                            catch (DbUpdateException ex)
+                            {
+                                Console.WriteLine($"Error saving car: {ex.InnerException?.Message ?? ex.Message}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+                            }
+                        }
                         break;
                     case "3":
-                        PrintAndEdit(db.Cars, "Car", c => $"{c.Model.ModelName} ({c.Year})",
-                            c =>
-                            {
-                                c.Year = int.Parse(GetInput("Year", c.Year.ToString()));
-                                c.Price = decimal.Parse(GetInput("Price", c.Price.ToString()));
-                                c.Mileage = int.Parse(GetInput("Mileage", c.Mileage.ToString()));
-                                c.Vin = GetInput("VIN", c.Vin);
-                            });
+                        using (var db = new CarMarketDbContext())
+                        {
+                            // Load cars with Model to avoid NullReferenceException
+                            var cars = db.Cars.Include(c => c.Model).ToList();
+                            PrintAndEdit(cars.AsQueryable(), "Car", c => $"{(c.Model != null ? c.Model.ModelName : "Unknown Model")} ({c.Year})",
+                                c =>
+                                {
+                                    c.Year = int.Parse(GetInput("Year", c.Year.ToString()));
+                                    c.Price = decimal.Parse(GetInput("Price", c.Price.ToString()));
+                                    c.Mileage = int.Parse(GetInput("Mileage", c.Mileage.ToString()));
+                                    c.Vin = GetInput("VIN", c.Vin);
+                                }, db);
+                        }
                         break;
                     case "4":
-                        PrintAndDelete(db.Cars, "Car", c => $"{c.Model.ModelName} ({c.Year})");
+                        using (var db = new CarMarketDbContext())
+                        {
+                            var cars = db.Cars.Include(c => c.Model).ToList();
+                            foreach (var car in cars)
+                            {
+                                Console.WriteLine($"{car.CarId}: {(car.Model != null ? car.Model.ModelName : "Unknown Model")} ({car.Year}) - ${car.Price}");
+                            }
+                            Console.Write("Enter Car ID to delete: ");
+                            if (int.TryParse(Console.ReadLine(), out int id))
+                            {
+                                var car = db.Cars
+                                    .Include(c => c.CarImages)
+                                    .Include(c => c.Favorites)
+                                    .Include(c => c.Sales)
+                                    .Include(c => c.Features)
+                                    .FirstOrDefault(c => c.CarId == id);
+                                if (car != null)
+                                {
+                                    db.CarImages.RemoveRange(car.CarImages);
+                                    db.Favorites.RemoveRange(car.Favorites);
+                                    db.Sales.RemoveRange(car.Sales);
+                                    car.Features.Clear();
+                                    db.Cars.Remove(car);
+                                    db.SaveChanges();
+                                    Console.WriteLine("Car deleted successfully!");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Car not found!");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Car ID!");
+                            }
+                        }
                         break;
                     case "5":
                         Console.Write("Enter Car ID: ");
                         if (int.TryParse(Console.ReadLine(), out int carId))
                         {
-                            var car = FindById<Car>(carId, db => db.Cars.Include(c => c.Model), "Car");
-                            if (car != null)
-                                Console.WriteLine($"{car.CarId}: {car.Model.ModelName} ({car.Year}) - ${car.Price} - Mileage: {car.Mileage} - VIN: {car.Vin}");
+                            using (var db = new CarMarketDbContext())
+                            {
+                                var car = FindById<Car>(carId, db => db.Cars.Include(c => c.Model), "Car");
+                                if (car != null)
+                                    Console.WriteLine($"{car.CarId}: {(car.Model != null ? car.Model.ModelName : "Unknown Model")} ({car.Year}) - ${car.Price} - Mileage: {car.Mileage} - VIN: {car.Vin}");
+                            }
                         }
                         break;
                     case "6":
@@ -231,7 +439,7 @@ namespace CarMarketConsoleApp
                         Console.WriteLine("Employee added successfully!");
                         break;
                     case "3":
-                        PrintAndEdit(db.Employees, "Employee", e => $"{e.FirstName} {e.LastName}",
+                        PrintAndEdit(db.Employees.AsQueryable(), "Employee", e => $"{e.FirstName} {e.LastName}",
                             e =>
                             {
                                 e.FirstName = GetInput("First Name", e.FirstName);
@@ -240,7 +448,7 @@ namespace CarMarketConsoleApp
                                 e.Salary = decimal.Parse(GetInput("Salary", e.Salary.ToString()));
                                 e.Email = GetInput("Email", e.Email);
                                 e.PhoneNumber = GetInput("Phone Number", e.PhoneNumber);
-                            });
+                            }, db);
                         break;
                     case "4":
                         PrintAndDelete(db.Employees, "Employee", e => $"{e.FirstName} {e.LastName}");
@@ -262,17 +470,39 @@ namespace CarMarketConsoleApp
             }
         }
 
-        static string GetInput(string field, string defaultValue = "")
+        static T FindById<T>(int id, Func<CarMarketDbContext, IQueryable<T>> querySelector, string entityName) where T : class
         {
-            Console.Write($"Enter {field} ({(string.IsNullOrEmpty(defaultValue) ? "required" : $"default: {defaultValue}")}): ");
+            using var db = new CarMarketDbContext();
+            var entity = querySelector(db).FirstOrDefault(e => EF.Property<int>(e, entityName + "Id") == id);
+            if (entity == null)
+            {
+                Console.WriteLine($"{entityName} with ID {id} not found!");
+                return null;
+            }
+            return entity;
+        }
+
+        static string GetInput(string field, string defaultValue = null)
+        {
+            Console.Write($"Enter {field} ({(string.IsNullOrEmpty(defaultValue) ? "optional" : $"default: {defaultValue}")}): ");
             string input = Console.ReadLine();
             return string.IsNullOrEmpty(input) ? defaultValue : input;
         }
 
-        static void PrintAndEdit<T>(DbSet<T> dbSet, string entityName, Func<T, string> displayFunc, Action<T> editFunc) where T : class
+        static int GetValidIntInput(string fieldName, Func<int, bool> isValid)
         {
-            using var db = new CarMarketDbContext();
-            var items = dbSet.ToList();
+            while (true)
+            {
+                Console.Write($"Enter {fieldName}: ");
+                if (int.TryParse(Console.ReadLine(), out int value) && isValid(value))
+                    return value;
+                Console.WriteLine($"Invalid {fieldName}. Please enter a valid ID from the list.");
+            }
+        }
+
+        static void PrintAndEdit<T>(IQueryable<T> queryable, string entityName, Func<T, string> displayFunc, Action<T> editFunc, CarMarketDbContext db) where T : class
+        {
+            var items = queryable.ToList();
             foreach (var item in items)
             {
                 Console.WriteLine($"{GetId(item)}: {displayFunc(item)}");
@@ -308,7 +538,7 @@ namespace CarMarketConsoleApp
                 var item = items.FirstOrDefault(i => GetId(i) == id);
                 if (item != null)
                 {
-                    dbSet.Remove(item);
+                    db.Remove(item);
                     db.SaveChanges();
                     Console.WriteLine($"{entityName} deleted successfully!");
                 }
